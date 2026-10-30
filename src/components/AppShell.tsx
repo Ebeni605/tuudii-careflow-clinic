@@ -2,7 +2,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import {
   LayoutDashboard, Users, UserPlus, ListOrdered, CalendarDays, Stethoscope,
-  FlaskConical, ShieldCheck, BadgeCheck, TestTubes, ScrollText, LogOut, ClipboardList, ListChecks, BookOpen,
+  FlaskConical, ShieldCheck, BadgeCheck, TestTubes, ScrollText, LogOut, ClipboardList, ListChecks, BookOpen, BarChart3, Receipt, Wallet,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu,
@@ -35,12 +35,15 @@ const NAV: { label: string; area: Area; items: { title: string; url: string; ico
       { title: "Result verification", url: "/lab/verify", icon: BadgeCheck },
     ],
   },
+  { label: "Billing", area: "billing", items: [{ title: "Invoices & payments", url: "/billing", icon: Receipt }] },
   {
     label: "Administration", area: "admin", items: [
+      { title: "Reports", url: "/admin/reports", icon: BarChart3 },
       { title: "Staff & roles", url: "/admin/staff", icon: ShieldCheck },
       { title: "Visit services", url: "/admin/services", icon: ListChecks },
       { title: "Test catalogue", url: "/admin/tests", icon: TestTubes },
       { title: "Diagnosis catalogue", url: "/admin/diagnoses", icon: BookOpen },
+      { title: "Billing setup", url: "/admin/billing", icon: Wallet },
       { title: "Audit log", url: "/admin/audit", icon: ScrollText },
     ],
   },

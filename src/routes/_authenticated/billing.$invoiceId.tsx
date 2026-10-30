@@ -19,7 +19,7 @@ import { patientName } from "@/lib/data";
 import { fmtDateTime } from "@/lib/opd-queries";
 import { friendlyDbError } from "@/lib/patient-schema";
 import { CHARGE_CATEGORY_LABEL, INVOICE_STATE_LABEL, invoiceState, money, PAYMENT_METHOD_LABEL, paymentProblem, priceProblem, useBillingSettings } from "@/lib/billing";
-import { BillingOff, STATE_VARIANT } from "./billing.index";
+import { BillingOff, STATE_VARIANT } from "@/components/billing/BillingOff";
 
 export const Route = createFileRoute("/_authenticated/billing/$invoiceId")({
   beforeLoad: requireArea("billing"),
