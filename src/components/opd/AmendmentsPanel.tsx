@@ -13,7 +13,7 @@ const KIND_LABEL: Record<string, string> = { addendum: "Addendum", correction: "
 const SECTIONS = ["Chief complaint", "History", "Examination", "Assessment", "Diagnosis", "Treatment plan", "Medication instructions", "Follow-up / referral", "Service form", "Other"];
 
 /** Signed notes are never overwritten; changes are appended here with name and time. */
-export function AmendmentsPanel({ consultationId, canAdd }: { consultationId: string; canAdd: boolean }) {
+export function AmendmentsPanel({ consultationId, visitId, patientId, canAdd }: { consultationId: string; visitId: string; patientId: string; canAdd: boolean }) {
   const { data: rows } = useQuery(amendmentsQuery(consultationId));
   const { data: names } = useStaffNames();
   const qc = useQueryClient();
@@ -28,7 +28,7 @@ export function AmendmentsPanel({ consultationId, canAdd }: { consultationId: st
     setBusy(true);
     const { error } = await supabase.from("consultation_amendments").insert({
       consultation_id: consultationId, kind, section: section || null, note: note.trim(),
-      visit_id: consultationId, patient_id: consultationId, // replaced by the database from the consultation
+      visit_id: visitId, patient_id: patientId,
     });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
