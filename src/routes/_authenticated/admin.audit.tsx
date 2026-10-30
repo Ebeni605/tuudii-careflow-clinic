@@ -13,16 +13,16 @@ import { LoadError, PageHeader, PageLoading, RequireArea } from "@/components/Ap
 import { Pager } from "@/components/reports/ReportKit";
 import { requireArea } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
-import { addDays, downloadCsv, rangeProblem, toCsv } from "@/lib/reports";
+import { addDays, downloadCsv, rangeProblem, searchDate, toCsv } from "@/lib/reports";
 import { clinicToday } from "@/lib/patient-schema";
 import { fmtDateTime } from "@/lib/opd-queries";
 
-type Search = { from?: string; to?: string };
+type Search = { from?: string | undefined; to?: string | undefined };
 
 export const Route = createFileRoute("/_authenticated/admin/audit")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    from: typeof s.from === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.from) ? s.from : undefined,
-    to: typeof s.to === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.to) ? s.to : undefined,
+    from: searchDate(s["from"]),
+    to: searchDate(s["to"]),
   }),
   beforeLoad: requireArea("admin"),
   head: () => ({ meta: [{ title: "Audit Log — Two D Medium Clinic" }, { name: "description", content: "Who changed which record, and when." }] }),
@@ -161,8 +161,8 @@ function AuditDetail({ id, onClose }: { id: number | null; onClose: () => void }
   });
   const diff = (data?.diff ?? null) as Record<string, unknown> | null;
   const changes: { field: string; old: unknown; new: unknown }[] = [];
-  if (diff && data?.action === "UPDATE" && diff.old && diff.new) {
-    const o = diff.old as Record<string, unknown>, nw = diff.new as Record<string, unknown>;
+  if (diff && data?.action === "UPDATE" && diff["old"] && diff["new"]) {
+    const o = diff["old"] as Record<string, unknown>, nw = diff["new"] as Record<string, unknown>;
     for (const k of Object.keys(nw)) if (JSON.stringify(o[k]) !== JSON.stringify(nw[k]) && k !== "updated_at") changes.push({ field: k, old: o[k], new: nw[k] });
   } else if (diff) {
     for (const [k, v] of Object.entries(diff)) if (v !== null && v !== "") changes.push({ field: k, old: undefined, new: v });

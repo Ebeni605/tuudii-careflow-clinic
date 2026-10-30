@@ -64,3 +64,8 @@ export function fmtMinutes(m: number | null | undefined) {
 export function pct(part: number, whole: number) {
   return whole > 0 ? `${Math.round((part / whole) * 100)}%` : "—";
 }
+
+/** A YYYY-MM-DD value from the URL, or undefined. */
+export function searchDate(v: unknown): string | undefined {
+  return typeof v === "string" && /^\d{4}-\d{2}-\d{2}$/.test(v) ? v : undefined;
+}
