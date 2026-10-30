@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { ErrorState, PageHeader, RequireArea } from "@/components/AppShell";
+import { LoadError, PageHeader, PageLoading, RequireArea } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { LabRequestForm } from "@/components/LabRequestForm";
 import { F, TemplateInput } from "@/components/opd/Field";
@@ -67,9 +67,9 @@ function Encounter() {
   const [busy, setBusy] = useState(false);
   const [confirmSign, setConfirmSign] = useState(false);
 
-  if (isLoading) return <div className="text-muted-foreground">Loading…</div>;
-  if (error) return <ErrorState message="Could not load this visit." onRetry={() => refetch()} />;
-  if (!visit) return <ErrorState message="Visit not found." />;
+  if (isLoading) return <PageLoading />;
+  if (error) return <LoadError message="Could not load this visit." onRetry={() => refetch()} />;
+  if (!visit) return <LoadError message="This visit was not found." />;
 
   const p = visit.patients!;
   const status = visit.status as VisitStatus;
@@ -332,5 +332,5 @@ function Encounter() {
 }
 
 function Row({ k, v }: { k: string; v: string | null | undefined }) {
-  return <div className="flex gap-2"><span className="text-muted-foreground">{k}:</span><span className="font-medium capitalize-first">{v || "—"}</span></div>;
+  return <div className="flex gap-2"><span className="text-muted-foreground">{k}:</span><span className="font-medium">{v || "—"}</span></div>;
 }
