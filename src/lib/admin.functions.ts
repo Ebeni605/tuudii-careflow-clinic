@@ -1,21 +1,31 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { AppRole } from "./workflow";
 
-const ROLES: AppRole[] = ["admin", "receptionist", "clinician", "lab_tech"];
+// Server-side validation (the browser form validates too, but never trust the browser)
+const role = z.enum(["admin", "receptionist", "clinician", "lab_tech"]);
+const password = z.string().min(8, "Password must be at least 8 characters").max(72, "Password is too long");
+const email = z.string().trim().toLowerCase().email("Valid email required").max(254);
+const fullName = z.string().trim().min(1, "Full name required").max(120);
+const phone = z.string().trim().max(20).regex(/^[+0-9 -]*$/, "Phone number is not valid").optional();
 
-function checkPassword(p: string) {
-  if (typeof p !== "string" || p.length < 8) throw new Error("Password must be at least 8 characters");
+function parse<T>(schema: z.ZodType<T>, d: unknown): T {
+  const r = schema.safeParse(d);
+  if (!r.success) throw new Error(r.error.issues[0]?.message ?? "Invalid input");
+  return r.data;
+}
+
+/** Records staff-account events that happen outside the database (auth accounts, passwords). Never stores the password. */
+async function auditAccountEvent(byUserId: string | null, targetUserId: string, action: string, details: Record<string, unknown>) {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  await supabaseAdmin.from("audit_log").insert({ user_id: byUserId, table_name: "staff_accounts", record_id: targetUserId, action, diff: details as never });
 }
 
 /** One-time setup: create the first administrator while no admin exists. */
 export const bootstrapAdmin = createServerFn({ method: "POST" })
-  .inputValidator((d: { email: string; password: string; fullName: string }) => {
-    if (!d?.email?.includes("@")) throw new Error("Valid email required");
-    checkPassword(d.password);
-    if (!d.fullName?.trim()) throw new Error("Full name required");
-    return { email: d.email.trim().toLowerCase(), password: d.password, fullName: d.fullName.trim().slice(0, 120) };
-  })
+  .inputValidator((d: { email: string; password: string; fullName: string }) =>
+    parse(z.object({ email, password, fullName }), d))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { count } = await supabaseAdmin
@@ -32,6 +42,7 @@ export const bootstrapAdmin = createServerFn({ method: "POST" })
     if (error || !created.user) throw new Error(error?.message ?? "Could not create user");
     await supabaseAdmin.from("profiles").upsert({ id: created.user.id, full_name: data.fullName });
     await supabaseAdmin.from("user_roles").insert({ user_id: created.user.id, role: "admin" });
+    await auditAccountEvent(created.user.id, created.user.id, "FIRST_ADMIN_CREATED", { email: data.email });
     return { ok: true };
   });
 
@@ -42,13 +53,8 @@ async function assertAdmin(context: { supabase: any; userId: string }) {
 
 export const createStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { email: string; password: string; fullName: string; phone?: string; roles: AppRole[] }) => {
-    if (!d?.email?.includes("@")) throw new Error("Valid email required");
-    checkPassword(d.password);
-    const roles = (d.roles ?? []).filter((r) => ROLES.includes(r));
-    if (!roles.length) throw new Error("Choose at least one role");
-    return { ...d, email: d.email.trim().toLowerCase(), fullName: d.fullName.trim().slice(0, 120), roles };
-  })
+  .inputValidator((d: { email: string; password: string; fullName: string; phone?: string; roles: AppRole[] }) =>
+    parse(z.object({ email, password, fullName, phone, roles: z.array(role).min(1, "Choose at least one role").max(4) }), d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -59,8 +65,12 @@ export const createStaff = createServerFn({ method: "POST" })
       user_metadata: { full_name: data.fullName },
     });
     if (error || !created.user) throw new Error(error?.message ?? "Could not create user");
-    await supabaseAdmin.from("profiles").upsert({ id: created.user.id, full_name: data.fullName, phone: data.phone ?? null });
-    await supabaseAdmin.from("user_roles").insert(data.roles.map((role) => ({ user_id: created.user!.id, role })));
+    const uid = created.user.id;
+    // Profile row may already exist from the sign-up trigger; write it as the admin so the audit log names them
+    await supabaseAdmin.from("profiles").upsert({ id: uid, full_name: data.fullName, phone: data.phone || null });
+    const { error: re } = await context.supabase.from("user_roles").insert([...new Set(data.roles)].map((r) => ({ user_id: uid, role: r })));
+    if (re) throw new Error(re.message);
+    await auditAccountEvent(context.userId, uid, "STAFF_CREATED", { email: data.email, roles: data.roles });
     return { ok: true };
   });
 
@@ -92,24 +102,46 @@ export const listStaff = createServerFn({ method: "POST" })
 
 export const updateStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { userId: string; roles: AppRole[]; active: boolean; canSelfVerify: boolean; canVerifyLab?: boolean; newPassword?: string }) => {
-    if (d.newPassword) checkPassword(d.newPassword);
-    return { ...d, roles: (d.roles ?? []).filter((r) => ROLES.includes(r)) };
-  })
+  .inputValidator((d: { userId: string; roles: AppRole[]; active: boolean; canSelfVerify: boolean; canVerifyLab?: boolean; newPassword?: string }) =>
+    parse(z.object({
+      userId: z.string().uuid(),
+      roles: z.array(role).max(4),
+      active: z.boolean(),
+      canSelfVerify: z.boolean(),
+      canVerifyLab: z.boolean().optional(),
+      newPassword: password.optional(),
+    }), d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
     if (data.userId === context.userId && (!data.roles.includes("admin") || !data.active)) {
       throw new Error("You cannot remove your own administrator access");
     }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("profiles").update({ active: data.active, can_self_verify: data.canSelfVerify, can_verify_lab: !!data.canVerifyLab }).eq("id", data.userId);
-    await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
-    if (data.roles.length) {
-      await supabaseAdmin.from("user_roles").insert(data.roles.map((role) => ({ user_id: data.userId, role })));
+    // Profile flags and roles are written with the administrator's own session, so RLS applies
+    // and the audit log records which administrator changed which permission.
+    const db = context.supabase;
+    const { error: pe } = await db.from("profiles")
+      .update({ active: data.active, can_self_verify: data.canSelfVerify, can_verify_lab: !!data.canVerifyLab })
+      .eq("id", data.userId);
+    if (pe) throw new Error(pe.message);
+    const { data: current, error: ce } = await db.from("user_roles").select("role").eq("user_id", data.userId);
+    if (ce) throw new Error(ce.message);
+    const have = new Set<string>((current ?? []).map((r: { role: string }) => r.role));
+    const want = new Set<string>(data.roles);
+    const remove = [...have].filter((r) => !want.has(r));
+    const add = [...want].filter((r) => !have.has(r));
+    if (remove.length) {
+      const { error } = await db.from("user_roles").delete().eq("user_id", data.userId).in("role", remove);
+      if (error) throw new Error(error.message);
+    }
+    if (add.length) {
+      const { error } = await db.from("user_roles").insert(add.map((r) => ({ user_id: data.userId, role: r })));
+      if (error) throw new Error(error.message);
     }
     if (data.newPassword) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, { password: data.newPassword });
       if (error) throw new Error(error.message);
+      await auditAccountEvent(context.userId, data.userId, "PASSWORD_RESET_BY_ADMIN", {});
     }
     return { ok: true };
   });
