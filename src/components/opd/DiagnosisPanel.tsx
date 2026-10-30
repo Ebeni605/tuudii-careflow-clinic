@@ -83,7 +83,7 @@ export function DiagnosisPanel({ visitId, patientId, editable }: { visitId: stri
           </div>
           <F label="Type">
             <Select value={type} onValueChange={(t) => setType(t as "primary")}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger aria-label="Diagnosis type"><SelectValue /></SelectTrigger>
               <SelectContent><SelectItem value="primary">Primary</SelectItem><SelectItem value="secondary">Secondary</SelectItem></SelectContent>
             </Select>
           </F>
