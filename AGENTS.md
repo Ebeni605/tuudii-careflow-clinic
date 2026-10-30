@@ -19,6 +19,10 @@
 - Staff accounts are created only by admin via server functions in `src/lib/admin.functions.ts` (service role loaded inside handlers); public signup is disabled; `bootstrapAdmin` works only while no admin exists.
 - Clinical CRUD uses the browser client under RLS; every clinical table has an audit trigger writing `audit_log`.
 - Service-specific consultation fields live in `src/lib/templates.ts`, stored in `consultations.template_data` (jsonb).
+- One consultation per visit, auto-created as `draft` when a clinician starts the visit; signing rules (`consult_before` trigger, mirrored by `signingProblems` in `workflow.ts`) and completion-requires-signed are DB-enforced so records stay medico-legally sound. Signed notes, their diagnoses and medicines are frozen; later changes go only into insert-only `consultation_amendments`.
+- Vital signs are insert-only (each measurement kept, BMI is a generated column); OPD lab orders go only through the atomic `create_lab_order` RPC, which links the encounter and moves the visit to `awaiting_lab` (all verified → `ready_for_review`).
+- Clinical tables grant nothing to `anon`; insert-only tables also revoke UPDATE/DELETE so a missing RLS policy is never the only guard.
+- Form helper `F` (`src/components/opd/Field.tsx`) links its label to Input/Textarea children; Select triggers need their own `aria-label`.
 - Lab catalogue sections/order follow the clinic's paper request form; printouts use `PrintHeader` plus `.no-print`/`print-area` CSS.
 - Patient number (`mrn`), registration date/staff, queue number/date and check-in staff/time are set and kept immutable by DB triggers; patients are never deleted — admin archives with a reason (`archived*` columns), archived patients cannot be booked or checked in.
 - Demographic corrections must carry a new `correction_note` (trigger-enforced) so the audit log records why; `middle_name` = father's name (required), `last_name` = grandfather's name ('' when unknown).
