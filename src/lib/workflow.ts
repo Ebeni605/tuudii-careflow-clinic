@@ -95,7 +95,7 @@ export function canAccess(roles: AppRole[], area: Area) {
   return roles.some((r) => AREA_ROLES[area].includes(r));
 }
 
-export function ageFromDob(dob: string | null, now = new Date(), estimated = false) {
+export function ageFromDob(dob: string | null, now = new Date(), estimated = false): string | null {
   if (!dob) return null;
   if (estimated) return `~${ageFromDob(dob, now)}`;
   const d = new Date(dob);

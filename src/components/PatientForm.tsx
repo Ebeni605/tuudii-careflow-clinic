@@ -9,7 +9,7 @@ import {
   AGE_UNITS, EMPTY_PATIENT, ETHIOPIA_REGIONS, ageInYears, clinicToday, patientSchema, type PatientFormValues,
 } from "@/lib/patient-schema";
 
-type Errors = Partial<Record<keyof PatientFormValues, string>>;
+type Errors = Partial<Record<keyof PatientFormValues, string | undefined>>;
 
 export function PatientForm({ initial, onSubmit, busy, submitLabel, extra }: {
   initial?: Partial<PatientFormValues>;

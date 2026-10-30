@@ -20,7 +20,7 @@ const TONE: Record<string, string> = {
   urgent: "bg-destructive text-destructive-foreground border-destructive",
 };
 
-export function StatusBadge({ status, label }: { status: string; label?: string }) {
+export function StatusBadge({ status, label }: { status: string; label?: string | undefined }) {
   return (
     <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap", TONE[status] ?? "bg-muted")}>
       {label ?? VISIT_STATUS_LABEL[status] ?? LAB_STATUS_LABEL[status] ?? APPT_STATUS_LABEL[status] ?? status.replace("_", " ")}
