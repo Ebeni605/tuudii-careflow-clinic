@@ -54,13 +54,13 @@ export function AmendmentsPanel({ consultationId, visitId, patientId, canAdd }: 
         <div className="grid gap-2 rounded-md border bg-secondary/30 p-3 md:grid-cols-[200px_220px_1fr]">
           <F label="Type">
             <Select value={kind} onValueChange={setKind}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger aria-label="Amendment type"><SelectValue /></SelectTrigger>
               <SelectContent>{Object.entries(KIND_LABEL).map(([k, l]) => <SelectItem key={k} value={k}>{l}</SelectItem>)}</SelectContent>
             </Select>
           </F>
           <F label={kind === "correction" ? "Part corrected" : "Part (optional)"} required={kind === "correction"}>
             <Select value={section} onValueChange={setSection}>
-              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectTrigger aria-label="Part of the note"><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>{SECTIONS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
             </Select>
           </F>
