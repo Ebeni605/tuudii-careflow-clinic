@@ -76,8 +76,8 @@ function Reports() {
 
   return (
     <div>
-      <PageHeader title="Reports" subtitle="Live figures from the clinic database. Aggregate reports show patient numbers only, never names or phone numbers."
-        actions={<Button variant="outline" onClick={() => window.print()}><Printer className="mr-1 h-4 w-4" />Print / save as PDF</Button>} />
+      <div className="no-print"><PageHeader title="Reports" subtitle="Live figures from the clinic database. Aggregate reports show patient numbers only, never names or phone numbers."
+        actions={<Button variant="outline" onClick={() => window.print()}><Printer className="mr-1 h-4 w-4" />Print / save as PDF</Button>} /></div>
 
       <Card className="no-print mb-4">
         <CardContent className="flex flex-wrap items-end gap-3 p-4">
