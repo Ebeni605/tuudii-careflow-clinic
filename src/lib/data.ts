@@ -7,9 +7,11 @@ export function patientName(p: { first_name: string; middle_name?: string | null
   return [p.first_name, p.middle_name, p.last_name].filter(Boolean).join(" ");
 }
 
-export function today() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+export { clinicToday as today } from "./patient-schema";
+
+/** Start/end of a clinic (Ethiopia, UTC+3) day as ISO timestamps. */
+export function clinicDayRange(day: string) {
+  return { from: new Date(`${day}T00:00:00+03:00`).toISOString(), to: new Date(`${day}T23:59:59.999+03:00`).toISOString() };
 }
 
 export function useServices() {
@@ -71,6 +73,14 @@ export const VISIT_STATUS_LABEL: Record<string, string> = {
   completed: "Completed",
   cancelled: "Cancelled",
   no_show: "No show",
+};
+
+export const APPT_STATUS_LABEL: Record<string, string> = {
+  scheduled: "Scheduled",
+  checked_in: "Checked in",
+  cancelled: "Cancelled",
+  no_show: "No show",
+  completed: "Completed",
 };
 
 export const LAB_STATUS_LABEL: Record<string, string> = {
