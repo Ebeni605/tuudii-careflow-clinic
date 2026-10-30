@@ -16,6 +16,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedNoAccessRouteImport } from './routes/_authenticated/no-access'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
+import { Route as AuthenticatedAdminDiagnosesRouteImport } from './routes/_authenticated/admin.diagnoses'
 import { Route as AuthenticatedAdminServicesRouteImport } from './routes/_authenticated/admin.services'
 import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authenticated/admin.staff'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
@@ -65,6 +66,12 @@ const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   path: '/admin/audit',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminDiagnosesRoute =
+  AuthenticatedAdminDiagnosesRouteImport.update({
+    id: '/admin/diagnoses',
+    path: '/admin/diagnoses',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminServicesRoute =
   AuthenticatedAdminServicesRouteImport.update({
     id: '/admin/services',
@@ -153,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/no-access': typeof AuthenticatedNoAccessRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/diagnoses': typeof AuthenticatedAdminDiagnosesRoute
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
@@ -175,6 +183,7 @@ export interface FileRoutesByTo {
   '/no-access': typeof AuthenticatedNoAccessRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/diagnoses': typeof AuthenticatedAdminDiagnosesRoute
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
@@ -199,6 +208,7 @@ export interface FileRoutesById {
   '/_authenticated/no-access': typeof AuthenticatedNoAccessRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/diagnoses': typeof AuthenticatedAdminDiagnosesRoute
   '/_authenticated/admin/services': typeof AuthenticatedAdminServicesRoute
   '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
@@ -223,6 +233,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/profile'
     | '/admin/audit'
+    | '/admin/diagnoses'
     | '/admin/services'
     | '/admin/staff'
     | '/admin/tests'
@@ -245,6 +256,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/profile'
     | '/admin/audit'
+    | '/admin/diagnoses'
     | '/admin/services'
     | '/admin/staff'
     | '/admin/tests'
@@ -268,6 +280,7 @@ export interface FileRouteTypes {
     | '/_authenticated/no-access'
     | '/_authenticated/profile'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/diagnoses'
     | '/_authenticated/admin/services'
     | '/_authenticated/admin/staff'
     | '/_authenticated/admin/tests'
@@ -339,6 +352,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/audit'
       fullPath: '/admin/audit'
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/diagnoses': {
+      id: '/_authenticated/admin/diagnoses'
+      path: '/admin/diagnoses'
+      fullPath: '/admin/diagnoses'
+      preLoaderRoute: typeof AuthenticatedAdminDiagnosesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/services': {
@@ -447,6 +467,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNoAccessRoute: typeof AuthenticatedNoAccessRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminDiagnosesRoute: typeof AuthenticatedAdminDiagnosesRoute
   AuthenticatedAdminServicesRoute: typeof AuthenticatedAdminServicesRoute
   AuthenticatedAdminStaffRoute: typeof AuthenticatedAdminStaffRoute
   AuthenticatedAdminTestsRoute: typeof AuthenticatedAdminTestsRoute
@@ -468,6 +489,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNoAccessRoute: AuthenticatedNoAccessRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminDiagnosesRoute: AuthenticatedAdminDiagnosesRoute,
   AuthenticatedAdminServicesRoute: AuthenticatedAdminServicesRoute,
   AuthenticatedAdminStaffRoute: AuthenticatedAdminStaffRoute,
   AuthenticatedAdminTestsRoute: AuthenticatedAdminTestsRoute,
