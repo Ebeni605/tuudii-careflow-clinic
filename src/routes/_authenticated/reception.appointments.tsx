@@ -34,7 +34,7 @@ function Appointments() {
     queryKey: ["appt_search", term],
     enabled: term.length >= 2 && !patient,
     queryFn: async () => (await supabase.from("patients").select("id, mrn, first_name, middle_name, last_name")
-      .or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,mrn.ilike.%${term}%,phone.ilike.%${term}%`).limit(6)).data ?? [],
+      .or(`first_name.ilike.%${term}%,middle_name.ilike.%${term}%,last_name.ilike.%${term}%,mrn.ilike.%${term}%,phone.ilike.%${term}%`).limit(6)).data ?? [],
   });
   const { data: appts, refetch } = useQuery({
     queryKey: ["appts", day],
