@@ -45,7 +45,7 @@ function AuthPage() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) return toast.error("Sign in failed: check email and password");
+    if (error) { toast.error("Sign in failed: check email and password"); return; }
     qc.clear();
     navigate({ to: "/dashboard", replace: true });
   }

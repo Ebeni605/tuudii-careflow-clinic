@@ -34,7 +34,7 @@ function Appointments() {
     queryKey: ["appt_search", term],
     enabled: term.length >= 2 && !patient,
     queryFn: async () => (await supabase.from("patients").select("id, mrn, first_name, middle_name, last_name")
-      .or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,mrn.ilike.%${term}%,phone.ilike.%${term}%`).limit(6)).data ?? [],
+      .or(`first_name.ilike.%${term}%,middle_name.ilike.%${term}%,last_name.ilike.%${term}%,mrn.ilike.%${term}%,phone.ilike.%${term}%`).limit(6)).data ?? [],
   });
   const { data: appts, refetch } = useQuery({
     queryKey: ["appts", day],
@@ -44,11 +44,11 @@ function Appointments() {
   const svc = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
 
   async function book() {
-    if (!patient || !service) return toast.error("Choose a patient and service");
+    if (!patient || !service) { toast.error("Choose a patient and service"); return; }
     const { error } = await supabase.from("appointments").insert({
       patient_id: patient.id, service_key: service, reason: reason || null, scheduled_at: new Date(`${date}T${time}:00`).toISOString(),
     });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Appointment booked");
     setPatient(null); setQ(""); setReason(""); setDay(date); refetch();
   }

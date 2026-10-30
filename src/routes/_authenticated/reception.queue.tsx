@@ -28,7 +28,7 @@ function Queue() {
     queryKey: ["checkin_search", term],
     enabled: term.length >= 2,
     queryFn: async () => (await supabase.from("patients").select("id, mrn, first_name, middle_name, last_name, phone")
-      .or(`first_name.ilike.%${term}%,last_name.ilike.%${term}%,mrn.ilike.%${term}%,phone.ilike.%${term}%`).limit(8)).data ?? [],
+      .or(`first_name.ilike.%${term}%,middle_name.ilike.%${term}%,last_name.ilike.%${term}%,mrn.ilike.%${term}%,phone.ilike.%${term}%`).limit(8)).data ?? [],
   });
   const { data: queue, refetch } = useQuery({
     queryKey: ["queue_today"],
