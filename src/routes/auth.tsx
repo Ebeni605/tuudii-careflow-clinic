@@ -32,6 +32,7 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [busy, setBusy] = useState(false);
+  const [forgot, setForgot] = useState<"" | "form" | "sent">("");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -48,6 +49,15 @@ function AuthPage() {
     if (error) { toast.error(error.message.includes("Invalid") ? "Wrong email or password" : "Sign in failed. Check your connection and try again."); return; }
     qc.clear();
     navigate({ to: "/dashboard", replace: true });
+  }
+
+  async function sendReset(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: `${window.location.origin}/reset-password` });
+    setBusy(false);
+    // Same message whether or not the address has an account, so staff emails cannot be probed
+    setForgot("sent");
   }
 
   async function setup(e: React.FormEvent) {
@@ -103,6 +113,23 @@ function AuthPage() {
           )}
         </CardHeader>
         <CardContent>
+          {forgot && !needsSetup ? (
+            <form onSubmit={sendReset} className="space-y-4">
+              {forgot === "sent" ? (
+                <p className="rounded-md bg-secondary p-3 text-sm" role="status">If this email belongs to a staff account, a reset link has been sent. Check the inbox (and spam folder). The link expires after a short time.</p>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground">Enter your staff email. You will receive a link to choose a new password. If you have no access to that email, ask the administrator to reset your password.</p>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="fem">Email</Label>
+                    <Input id="fem" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={busy}>{busy ? "Sending…" : "Send reset link"}</Button>
+                </>
+              )}
+              <Button type="button" variant="link" className="w-full" onClick={() => setForgot("")}>Back to sign in</Button>
+            </form>
+          ) : (
           <form onSubmit={needsSetup ? setup : signIn} className="space-y-4">
             {needsSetup && (
               <div className="space-y-1.5">
@@ -116,13 +143,14 @@ function AuthPage() {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="pw">Password</Label>
-              <Input id="pw" type="password" autoComplete={needsSetup ? "new-password" : "current-password"} minLength={needsSetup ? 8 : undefined} value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input id="pw" type="password" autoComplete={needsSetup ? "new-password" : "current-password"} minLength={needsSetup ? 10 : undefined} value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             <Button type="submit" className="w-full" disabled={busy}>
               {busy ? "Please wait…" : needsSetup ? "Create administrator" : "Sign in"}
             </Button>
-            {!needsSetup && <p className="text-center text-xs text-muted-foreground">Forgot your password? Ask the clinic administrator to reset it.</p>}
+            {!needsSetup && <Button type="button" variant="link" className="w-full text-xs" onClick={() => setForgot("form")}>Forgot your password?</Button>}
           </form>
+          )}
         </CardContent>
       </Card>
       </div>

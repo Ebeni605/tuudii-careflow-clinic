@@ -1,11 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
+import { passwordProblem } from "@/lib/session";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { AppRole } from "./workflow";
 
 // Server-side validation (the browser form validates too, but never trust the browser)
 const role = z.enum(["admin", "receptionist", "clinician", "lab_tech"]);
-const password = z.string().min(8, "Password must be at least 8 characters").max(72, "Password is too long");
+const password = z.string().superRefine((v, ctx) => {
+  const problem = passwordProblem(v);
+  if (problem) ctx.addIssue({ code: "custom", message: problem });
+});
 const email = z.string().trim().toLowerCase().email("Valid email required").max(254);
 const fullName = z.string().trim().min(1, "Full name required").max(120);
 const phone = z.string().trim().max(20).regex(/^[+0-9 -]*$/, "Phone number is not valid").optional();

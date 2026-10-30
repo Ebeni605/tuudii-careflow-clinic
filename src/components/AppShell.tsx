@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserCircle } from "lucide-react";
 import { ClinicLogo } from "@/components/ClinicBrand";
+import { IdleSignOut } from "@/components/IdleSignOut";
 import { useSignOut, useStaff } from "@/lib/auth";
 import { canAccess, ROLE_LABELS, type Area } from "@/lib/workflow";
 
@@ -102,6 +103,7 @@ export function AppShell() {
   const signOut = useSignOut();
   return (
     <SidebarProvider>
+      {me && <IdleSignOut />}
       <div className="flex min-h-screen w-full">
         <div className="no-print"><AppSidebar /></div>
         <div className="flex min-w-0 flex-1 flex-col">

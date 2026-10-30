@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { requireArea, useStaff } from "@/lib/auth";
 import { ROLE_LABELS } from "@/lib/workflow";
+import { PASSWORD_HINT, passwordProblem } from "@/lib/session";
 
 export const Route = createFileRoute("/_authenticated/profile")({
   beforeLoad: requireArea("dashboard"),
@@ -44,7 +45,8 @@ function Profile() {
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
-    if (pw.length < 8) { toast.error("New password must be at least 8 characters"); return; }
+    const problem = passwordProblem(pw, me?.email);
+    if (problem) { toast.error(problem); return; }
     if (pw !== pw2) { toast.error("New passwords do not match"); return; }
     setBusy("pw");
     // Re-check the current password before changing it
@@ -82,7 +84,7 @@ function Profile() {
         <CardContent>
           <form onSubmit={changePassword} className="grid gap-4 sm:grid-cols-3">
             <div className="space-y-1.5"><Label htmlFor="cp">Current password</Label><Input id="cp" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} required /></div>
-            <div className="space-y-1.5"><Label htmlFor="np">New password</Label><Input id="np" type="password" autoComplete="new-password" minLength={8} value={pw} onChange={(e) => setPw(e.target.value)} required /></div>
+            <div className="space-y-1.5"><Label htmlFor="np">New password</Label><Input id="np" type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} required /><p className="text-xs text-muted-foreground">{PASSWORD_HINT}</p></div>
             <div className="space-y-1.5"><Label htmlFor="np2">Repeat new password</Label><Input id="np2" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} required /></div>
             <div><Button type="submit" disabled={busy === "pw"}>{busy === "pw" ? "Changing…" : "Change password"}</Button></div>
           </form>
