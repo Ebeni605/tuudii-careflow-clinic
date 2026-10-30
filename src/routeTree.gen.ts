@@ -14,7 +14,10 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients.index'
+import { Route as AuthenticatedPatientsPatientIdRouteImport } from './routes/_authenticated/patients.$patientId'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients.new'
+import { Route as AuthenticatedReceptionAppointmentsRouteImport } from './routes/_authenticated/reception.appointments'
+import { Route as AuthenticatedReceptionQueueRouteImport } from './routes/_authenticated/reception.queue'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,10 +44,28 @@ const AuthenticatedPatientsIndexRoute =
     path: '/patients/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedPatientsPatientIdRoute =
+  AuthenticatedPatientsPatientIdRouteImport.update({
+    id: '/patients/$patientId',
+    path: '/patients/$patientId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPatientsNewRoute =
   AuthenticatedPatientsNewRouteImport.update({
     id: '/patients/new',
     path: '/patients/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReceptionAppointmentsRoute =
+  AuthenticatedReceptionAppointmentsRouteImport.update({
+    id: '/reception/appointments',
+    path: '/reception/appointments',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReceptionQueueRoute =
+  AuthenticatedReceptionQueueRouteImport.update({
+    id: '/reception/queue',
+    path: '/reception/queue',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -52,14 +73,20 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/reception/appointments': typeof AuthenticatedReceptionAppointmentsRoute
+  '/reception/queue': typeof AuthenticatedReceptionQueueRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/reception/appointments': typeof AuthenticatedReceptionAppointmentsRoute
+  '/reception/queue': typeof AuthenticatedReceptionQueueRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
 }
 export interface FileRoutesById {
@@ -68,21 +95,43 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
+  '/_authenticated/reception/appointments': typeof AuthenticatedReceptionAppointmentsRoute
+  '/_authenticated/reception/queue': typeof AuthenticatedReceptionQueueRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/patients/new' | '/patients/'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/patients/$patientId'
+    | '/patients/new'
+    | '/reception/appointments'
+    | '/reception/queue'
+    | '/patients/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/patients/new' | '/patients'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/patients/$patientId'
+    | '/patients/new'
+    | '/reception/appointments'
+    | '/reception/queue'
+    | '/patients'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/patients/$patientId'
     | '/_authenticated/patients/new'
+    | '/_authenticated/reception/appointments'
+    | '/_authenticated/reception/queue'
     | '/_authenticated/patients/'
   fileRoutesById: FileRoutesById
 }
@@ -129,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPatientsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/patients/$patientId': {
+      id: '/_authenticated/patients/$patientId'
+      path: '/patients/$patientId'
+      fullPath: '/patients/$patientId'
+      preLoaderRoute: typeof AuthenticatedPatientsPatientIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/patients/new': {
       id: '/_authenticated/patients/new'
       path: '/patients/new'
@@ -136,18 +192,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPatientsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reception/appointments': {
+      id: '/_authenticated/reception/appointments'
+      path: '/reception/appointments'
+      fullPath: '/reception/appointments'
+      preLoaderRoute: typeof AuthenticatedReceptionAppointmentsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reception/queue': {
+      id: '/_authenticated/reception/queue'
+      path: '/reception/queue'
+      fullPath: '/reception/queue'
+      preLoaderRoute: typeof AuthenticatedReceptionQueueRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedPatientsPatientIdRoute: typeof AuthenticatedPatientsPatientIdRoute
   AuthenticatedPatientsNewRoute: typeof AuthenticatedPatientsNewRoute
+  AuthenticatedReceptionAppointmentsRoute: typeof AuthenticatedReceptionAppointmentsRoute
+  AuthenticatedReceptionQueueRoute: typeof AuthenticatedReceptionQueueRoute
   AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedPatientsPatientIdRoute: AuthenticatedPatientsPatientIdRoute,
   AuthenticatedPatientsNewRoute: AuthenticatedPatientsNewRoute,
+  AuthenticatedReceptionAppointmentsRoute:
+    AuthenticatedReceptionAppointmentsRoute,
+  AuthenticatedReceptionQueueRoute: AuthenticatedReceptionQueueRoute,
   AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
 }
 
