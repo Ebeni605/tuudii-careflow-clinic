@@ -1,11 +1,15 @@
 import { createServerFn } from "@tanstack/react-start";
+import { passwordProblem } from "@/lib/session";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { AppRole } from "./workflow";
 
 // Server-side validation (the browser form validates too, but never trust the browser)
 const role = z.enum(["admin", "receptionist", "clinician", "lab_tech"]);
-const password = z.string().min(8, "Password must be at least 8 characters").max(72, "Password is too long");
+const password = z.string().superRefine((v, ctx) => {
+  const problem = passwordProblem(v);
+  if (problem) ctx.addIssue({ code: "custom", message: problem });
+});
 const email = z.string().trim().toLowerCase().email("Valid email required").max(254);
 const fullName = z.string().trim().min(1, "Full name required").max(120);
 const phone = z.string().trim().max(20).regex(/^[+0-9 -]*$/, "Phone number is not valid").optional();
@@ -125,8 +129,9 @@ export const updateStaff = createServerFn({ method: "POST" })
     if (pe) throw new Error(pe.message);
     const { data: current, error: ce } = await db.from("user_roles").select("role").eq("user_id", data.userId);
     if (ce) throw new Error(ce.message);
-    const have = new Set<string>((current ?? []).map((r: { role: string }) => r.role));
-    const want = new Set<string>(data.roles);
+    type Role = "admin" | "receptionist" | "clinician" | "lab_tech";
+    const have = new Set<Role>((current ?? []).map((r) => r.role as Role));
+    const want = new Set<Role>(data.roles as Role[]);
     const remove = [...have].filter((r) => !want.has(r));
     const add = [...want].filter((r) => !have.has(r));
     if (remove.length) {

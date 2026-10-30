@@ -12,16 +12,19 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedNoAccessRouteImport } from './routes/_authenticated/no-access'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
+import { Route as AuthenticatedAdminBillingRouteImport } from './routes/_authenticated/admin.billing'
 import { Route as AuthenticatedAdminDiagnosesRouteImport } from './routes/_authenticated/admin.diagnoses'
 import { Route as AuthenticatedAdminReportsRouteImport } from './routes/_authenticated/admin.reports'
 import { Route as AuthenticatedAdminServicesRouteImport } from './routes/_authenticated/admin.services'
 import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authenticated/admin.staff'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
 import { Route as AuthenticatedBillingIndexRouteImport } from './routes/_authenticated/billing.index'
+import { Route as AuthenticatedBillingInvoiceIdRouteImport } from './routes/_authenticated/billing.$invoiceId'
 import { Route as AuthenticatedLabIndexRouteImport } from './routes/_authenticated/lab.index'
 import { Route as AuthenticatedLabVerifyRouteImport } from './routes/_authenticated/lab.verify'
 import { Route as AuthenticatedOpdIndexRouteImport } from './routes/_authenticated/opd.index'
@@ -31,6 +34,7 @@ import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenti
 import { Route as AuthenticatedReceptionIndexRouteImport } from './routes/_authenticated/reception.index'
 import { Route as AuthenticatedReceptionAppointmentsRouteImport } from './routes/_authenticated/reception.appointments'
 import { Route as AuthenticatedReceptionQueueRouteImport } from './routes/_authenticated/reception.queue'
+import { Route as AuthenticatedBillingReceiptPaymentIdRouteImport } from './routes/_authenticated/billing.receipt.$paymentId'
 import { Route as AuthenticatedLabReportRequestIdRouteImport } from './routes/_authenticated/lab.report.$requestId'
 import { Route as AuthenticatedLabRequestRequestIdRouteImport } from './routes/_authenticated/lab.request.$requestId'
 import { Route as AuthenticatedOpdVisitVisitIdRouteImport } from './routes/_authenticated/opd.visit.$visitId'
@@ -47,6 +51,11 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
@@ -69,6 +78,12 @@ const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   path: '/admin/audit',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminBillingRoute =
+  AuthenticatedAdminBillingRouteImport.update({
+    id: '/admin/billing',
+    path: '/admin/billing',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminDiagnosesRoute =
   AuthenticatedAdminDiagnosesRouteImport.update({
     id: '/admin/diagnoses',
@@ -101,6 +116,12 @@ const AuthenticatedBillingIndexRoute =
   AuthenticatedBillingIndexRouteImport.update({
     id: '/billing/',
     path: '/billing/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBillingInvoiceIdRoute =
+  AuthenticatedBillingInvoiceIdRouteImport.update({
+    id: '/billing/$invoiceId',
+    path: '/billing/$invoiceId',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedLabIndexRoute = AuthenticatedLabIndexRouteImport.update({
@@ -154,6 +175,12 @@ const AuthenticatedReceptionQueueRoute =
     path: '/reception/queue',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBillingReceiptPaymentIdRoute =
+  AuthenticatedBillingReceiptPaymentIdRouteImport.update({
+    id: '/billing/receipt/$paymentId',
+    path: '/billing/receipt/$paymentId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedLabReportRequestIdRoute =
   AuthenticatedLabReportRequestIdRouteImport.update({
     id: '/lab/report/$requestId',
@@ -176,15 +203,18 @@ const AuthenticatedOpdVisitVisitIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/no-access': typeof AuthenticatedNoAccessRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/diagnoses': typeof AuthenticatedAdminDiagnosesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
+  '/billing/$invoiceId': typeof AuthenticatedBillingInvoiceIdRoute
   '/lab/verify': typeof AuthenticatedLabVerifyRoute
   '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -195,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/opd/': typeof AuthenticatedOpdIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
   '/reception/': typeof AuthenticatedReceptionIndexRoute
+  '/billing/receipt/$paymentId': typeof AuthenticatedBillingReceiptPaymentIdRoute
   '/lab/report/$requestId': typeof AuthenticatedLabReportRequestIdRoute
   '/lab/request/$requestId': typeof AuthenticatedLabRequestRequestIdRoute
   '/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
@@ -202,15 +233,18 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/no-access': typeof AuthenticatedNoAccessRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/admin/diagnoses': typeof AuthenticatedAdminDiagnosesRoute
   '/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
+  '/billing/$invoiceId': typeof AuthenticatedBillingInvoiceIdRoute
   '/lab/verify': typeof AuthenticatedLabVerifyRoute
   '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
   '/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -221,6 +255,7 @@ export interface FileRoutesByTo {
   '/opd': typeof AuthenticatedOpdIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
   '/reception': typeof AuthenticatedReceptionIndexRoute
+  '/billing/receipt/$paymentId': typeof AuthenticatedBillingReceiptPaymentIdRoute
   '/lab/report/$requestId': typeof AuthenticatedLabReportRequestIdRoute
   '/lab/request/$requestId': typeof AuthenticatedLabRequestRequestIdRoute
   '/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
@@ -230,15 +265,18 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/no-access': typeof AuthenticatedNoAccessRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/billing': typeof AuthenticatedAdminBillingRoute
   '/_authenticated/admin/diagnoses': typeof AuthenticatedAdminDiagnosesRoute
   '/_authenticated/admin/reports': typeof AuthenticatedAdminReportsRoute
   '/_authenticated/admin/services': typeof AuthenticatedAdminServicesRoute
   '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
+  '/_authenticated/billing/$invoiceId': typeof AuthenticatedBillingInvoiceIdRoute
   '/_authenticated/lab/verify': typeof AuthenticatedLabVerifyRoute
   '/_authenticated/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
@@ -249,6 +287,7 @@ export interface FileRoutesById {
   '/_authenticated/opd/': typeof AuthenticatedOpdIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
   '/_authenticated/reception/': typeof AuthenticatedReceptionIndexRoute
+  '/_authenticated/billing/receipt/$paymentId': typeof AuthenticatedBillingReceiptPaymentIdRoute
   '/_authenticated/lab/report/$requestId': typeof AuthenticatedLabReportRequestIdRoute
   '/_authenticated/lab/request/$requestId': typeof AuthenticatedLabRequestRequestIdRoute
   '/_authenticated/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
@@ -258,15 +297,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/reset-password'
     | '/dashboard'
     | '/no-access'
     | '/profile'
     | '/admin/audit'
+    | '/admin/billing'
     | '/admin/diagnoses'
     | '/admin/reports'
     | '/admin/services'
     | '/admin/staff'
     | '/admin/tests'
+    | '/billing/$invoiceId'
     | '/lab/verify'
     | '/patients/$patientId'
     | '/patients/new'
@@ -277,6 +319,7 @@ export interface FileRouteTypes {
     | '/opd/'
     | '/patients/'
     | '/reception/'
+    | '/billing/receipt/$paymentId'
     | '/lab/report/$requestId'
     | '/lab/request/$requestId'
     | '/opd/visit/$visitId'
@@ -284,15 +327,18 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/reset-password'
     | '/dashboard'
     | '/no-access'
     | '/profile'
     | '/admin/audit'
+    | '/admin/billing'
     | '/admin/diagnoses'
     | '/admin/reports'
     | '/admin/services'
     | '/admin/staff'
     | '/admin/tests'
+    | '/billing/$invoiceId'
     | '/lab/verify'
     | '/patients/$patientId'
     | '/patients/new'
@@ -303,6 +349,7 @@ export interface FileRouteTypes {
     | '/opd'
     | '/patients'
     | '/reception'
+    | '/billing/receipt/$paymentId'
     | '/lab/report/$requestId'
     | '/lab/request/$requestId'
     | '/opd/visit/$visitId'
@@ -311,15 +358,18 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/reset-password'
     | '/_authenticated/dashboard'
     | '/_authenticated/no-access'
     | '/_authenticated/profile'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/billing'
     | '/_authenticated/admin/diagnoses'
     | '/_authenticated/admin/reports'
     | '/_authenticated/admin/services'
     | '/_authenticated/admin/staff'
     | '/_authenticated/admin/tests'
+    | '/_authenticated/billing/$invoiceId'
     | '/_authenticated/lab/verify'
     | '/_authenticated/patients/$patientId'
     | '/_authenticated/patients/new'
@@ -330,6 +380,7 @@ export interface FileRouteTypes {
     | '/_authenticated/opd/'
     | '/_authenticated/patients/'
     | '/_authenticated/reception/'
+    | '/_authenticated/billing/receipt/$paymentId'
     | '/_authenticated/lab/report/$requestId'
     | '/_authenticated/lab/request/$requestId'
     | '/_authenticated/opd/visit/$visitId'
@@ -339,6 +390,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -362,6 +414,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -390,6 +449,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/audit'
       fullPath: '/admin/audit'
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/admin/billing': {
+      id: '/_authenticated/admin/billing'
+      path: '/admin/billing'
+      fullPath: '/admin/billing'
+      preLoaderRoute: typeof AuthenticatedAdminBillingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/diagnoses': {
@@ -432,6 +498,13 @@ declare module '@tanstack/react-router' {
       path: '/billing'
       fullPath: '/billing/'
       preLoaderRoute: typeof AuthenticatedBillingIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/billing/$invoiceId': {
+      id: '/_authenticated/billing/$invoiceId'
+      path: '/billing/$invoiceId'
+      fullPath: '/billing/$invoiceId'
+      preLoaderRoute: typeof AuthenticatedBillingInvoiceIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/lab/': {
@@ -497,6 +570,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReceptionQueueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/billing/receipt/$paymentId': {
+      id: '/_authenticated/billing/receipt/$paymentId'
+      path: '/billing/receipt/$paymentId'
+      fullPath: '/billing/receipt/$paymentId'
+      preLoaderRoute: typeof AuthenticatedBillingReceiptPaymentIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/lab/report/$requestId': {
       id: '/_authenticated/lab/report/$requestId'
       path: '/lab/report/$requestId'
@@ -526,11 +606,13 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNoAccessRoute: typeof AuthenticatedNoAccessRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminBillingRoute: typeof AuthenticatedAdminBillingRoute
   AuthenticatedAdminDiagnosesRoute: typeof AuthenticatedAdminDiagnosesRoute
   AuthenticatedAdminReportsRoute: typeof AuthenticatedAdminReportsRoute
   AuthenticatedAdminServicesRoute: typeof AuthenticatedAdminServicesRoute
   AuthenticatedAdminStaffRoute: typeof AuthenticatedAdminStaffRoute
   AuthenticatedAdminTestsRoute: typeof AuthenticatedAdminTestsRoute
+  AuthenticatedBillingInvoiceIdRoute: typeof AuthenticatedBillingInvoiceIdRoute
   AuthenticatedLabVerifyRoute: typeof AuthenticatedLabVerifyRoute
   AuthenticatedPatientsPatientIdRoute: typeof AuthenticatedPatientsPatientIdRoute
   AuthenticatedPatientsNewRoute: typeof AuthenticatedPatientsNewRoute
@@ -541,6 +623,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOpdIndexRoute: typeof AuthenticatedOpdIndexRoute
   AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
   AuthenticatedReceptionIndexRoute: typeof AuthenticatedReceptionIndexRoute
+  AuthenticatedBillingReceiptPaymentIdRoute: typeof AuthenticatedBillingReceiptPaymentIdRoute
   AuthenticatedLabReportRequestIdRoute: typeof AuthenticatedLabReportRequestIdRoute
   AuthenticatedLabRequestRequestIdRoute: typeof AuthenticatedLabRequestRequestIdRoute
   AuthenticatedOpdVisitVisitIdRoute: typeof AuthenticatedOpdVisitVisitIdRoute
@@ -551,11 +634,13 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNoAccessRoute: AuthenticatedNoAccessRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminBillingRoute: AuthenticatedAdminBillingRoute,
   AuthenticatedAdminDiagnosesRoute: AuthenticatedAdminDiagnosesRoute,
   AuthenticatedAdminReportsRoute: AuthenticatedAdminReportsRoute,
   AuthenticatedAdminServicesRoute: AuthenticatedAdminServicesRoute,
   AuthenticatedAdminStaffRoute: AuthenticatedAdminStaffRoute,
   AuthenticatedAdminTestsRoute: AuthenticatedAdminTestsRoute,
+  AuthenticatedBillingInvoiceIdRoute: AuthenticatedBillingInvoiceIdRoute,
   AuthenticatedLabVerifyRoute: AuthenticatedLabVerifyRoute,
   AuthenticatedPatientsPatientIdRoute: AuthenticatedPatientsPatientIdRoute,
   AuthenticatedPatientsNewRoute: AuthenticatedPatientsNewRoute,
@@ -567,6 +652,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOpdIndexRoute: AuthenticatedOpdIndexRoute,
   AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
   AuthenticatedReceptionIndexRoute: AuthenticatedReceptionIndexRoute,
+  AuthenticatedBillingReceiptPaymentIdRoute:
+    AuthenticatedBillingReceiptPaymentIdRoute,
   AuthenticatedLabReportRequestIdRoute: AuthenticatedLabReportRequestIdRoute,
   AuthenticatedLabRequestRequestIdRoute: AuthenticatedLabRequestRequestIdRoute,
   AuthenticatedOpdVisitVisitIdRoute: AuthenticatedOpdVisitVisitIdRoute,
@@ -579,6 +666,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

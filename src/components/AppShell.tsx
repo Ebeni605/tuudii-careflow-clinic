@@ -2,7 +2,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import {
   LayoutDashboard, Users, UserPlus, ListOrdered, CalendarDays, Stethoscope,
-  FlaskConical, ShieldCheck, BadgeCheck, TestTubes, ScrollText, LogOut, ClipboardList, ListChecks, BookOpen,
+  FlaskConical, ShieldCheck, BadgeCheck, TestTubes, ScrollText, LogOut, ClipboardList, ListChecks, BookOpen, BarChart3, Receipt, Wallet,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu,
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { UserCircle } from "lucide-react";
 import { ClinicLogo } from "@/components/ClinicBrand";
+import { IdleSignOut } from "@/components/IdleSignOut";
 import { useSignOut, useStaff } from "@/lib/auth";
 import { canAccess, ROLE_LABELS, type Area } from "@/lib/workflow";
 
@@ -35,12 +36,15 @@ const NAV: { label: string; area: Area; items: { title: string; url: string; ico
       { title: "Result verification", url: "/lab/verify", icon: BadgeCheck },
     ],
   },
+  { label: "Billing", area: "billing", items: [{ title: "Invoices & payments", url: "/billing", icon: Receipt }] },
   {
     label: "Administration", area: "admin", items: [
+      { title: "Reports", url: "/admin/reports", icon: BarChart3 },
       { title: "Staff & roles", url: "/admin/staff", icon: ShieldCheck },
       { title: "Visit services", url: "/admin/services", icon: ListChecks },
       { title: "Test catalogue", url: "/admin/tests", icon: TestTubes },
       { title: "Diagnosis catalogue", url: "/admin/diagnoses", icon: BookOpen },
+      { title: "Billing setup", url: "/admin/billing", icon: Wallet },
       { title: "Audit log", url: "/admin/audit", icon: ScrollText },
     ],
   },
@@ -99,6 +103,7 @@ export function AppShell() {
   const signOut = useSignOut();
   return (
     <SidebarProvider>
+      {me && <IdleSignOut />}
       <div className="flex min-h-screen w-full">
         <div className="no-print"><AppSidebar /></div>
         <div className="flex min-w-0 flex-1 flex-col">

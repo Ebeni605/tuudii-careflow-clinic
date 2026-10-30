@@ -167,7 +167,7 @@ function ManagementSummary() {
   const d = data;
   const groups: { title: string; items: { label: string; value: number | undefined; warn?: boolean }[] }[] = [
     { title: "Patients", items: [
-      { label: "Registered patients", value: d?.total_patients },
+      { label: "Active patient records", value: d?.total_patients },
       { label: "New registrations today", value: d?.new_registrations },
     ] },
     { title: "OPD today", items: [

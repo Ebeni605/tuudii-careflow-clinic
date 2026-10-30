@@ -14,33 +14,17 @@ import { LoadError, PageHeader, PageLoading, RequireArea } from "@/components/Ap
 import { PatientPicker, type PickedPatient } from "@/components/PatientPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { requireArea, useStaff } from "@/lib/auth";
-import { clinicDayRange, patientName, SERVICE_FALLBACK, useServices } from "@/lib/data";
+import { clinicDayRange, patientName, useServices } from "@/lib/data";
 import { clinicToday, friendlyDbError } from "@/lib/patient-schema";
 import { fmtDateTime } from "@/lib/opd-queries";
 import { INVOICE_STATE_LABEL, invoiceState, money, useBillingSettings, type InvoiceState } from "@/lib/billing";
+import { BillingOff, STATE_VARIANT } from "@/components/billing/BillingOff";
 
 export const Route = createFileRoute("/_authenticated/billing/")({
   beforeLoad: requireArea("billing"),
   head: () => ({ meta: [{ title: "Billing — Two D Medium Clinic" }, { name: "description", content: "Invoices, payments and receipts (optional module)." }] }),
   component: () => <RequireArea area="billing"><Billing /></RequireArea>,
 });
-
-export function BillingOff({ isAdmin }: { isAdmin: boolean }) {
-  return (
-    <Card className="border-destructive/40">
-      <CardContent className="space-y-2 p-5 text-sm">
-        <p className="font-semibold text-destructive">Billing is switched off (not configured).</p>
-        <p>The clinic has not yet approved a price list. No invoices or payments can be recorded until an administrator enters the approved prices and switches billing on.</p>
-        {isAdmin ? <Link to="/admin/billing" className="font-medium text-primary hover:underline">Open billing setup →</Link>
-          : <p className="text-muted-foreground">Ask the administrator if the clinic wants to use billing.</p>}
-      </CardContent>
-    </Card>
-  );
-}
-
-export const STATE_VARIANT: Record<InvoiceState, "default" | "secondary" | "destructive" | "outline"> = {
-  draft: "outline", unpaid: "destructive", partly_paid: "secondary", paid: "default", void: "outline",
-};
 
 function Billing() {
   const { data: me } = useStaff();
@@ -138,7 +122,7 @@ function NewInvoice() {
       return data;
     },
   });
-  const svcName = (k: string) => services?.find((s) => s.key === k)?.name ?? SERVICE_FALLBACK;
+  const svcName = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
 
   async function create() {
     if (!patient) return;

@@ -141,6 +141,7 @@ export function friendlyDbError(message: string) {
   if (message.includes("visits_one_active_per_patient_day") || message.includes("already in today")) return "This patient is already in today's queue.";
   if (message.includes("appointments_one_per_day")) return "This patient already has an appointment on that day.";
   if (message.includes("visits_one_per_appointment")) return "This appointment has already been checked in.";
+  if (message.includes("billing_one_reversal_per_payment")) return "This payment has already been reversed.";
   if (message.includes("row-level security")) return "Your role is not allowed to do this.";
   return message;
 }

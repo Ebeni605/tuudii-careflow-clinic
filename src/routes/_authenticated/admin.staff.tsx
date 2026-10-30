@@ -73,7 +73,7 @@ function Staff() {
                 <div className="space-y-1.5"><Label>Full name</Label><Input value={f.fullName} onChange={(e) => setF({ ...f, fullName: e.target.value })} /></div>
                 <div className="space-y-1.5"><Label>Email (used to sign in)</Label><Input type="email" value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} /></div>
                 <div className="space-y-1.5"><Label>Phone</Label><Input value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></div>
-                <div className="space-y-1.5"><Label>Temporary password (min. 8 characters)</Label><Input type="text" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} /></div>
+                <div className="space-y-1.5"><Label>Temporary password (min. 10 characters, letters and numbers)</Label><Input type="text" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} /></div>
                 <div className="space-y-1.5"><Label>Roles</Label><RolePicker value={f.roles} onChange={(roles) => setF({ ...f, roles })} /></div>
                 <Button className="w-full" onClick={add}>Create account</Button>
               </div>
@@ -105,7 +105,7 @@ function Staff() {
             <label className="flex items-center gap-2 text-sm"><Switch checked={edit.active} onCheckedChange={(active) => setEdit({ ...edit, active })} />Account active</label>
             <label className="flex items-center gap-2 text-sm"><Switch checked={edit.canVerifyLab} onCheckedChange={(canVerifyLab) => setEdit({ ...edit, canVerifyLab })} />May verify laboratory results (laboratory technicians only)</label>
             <label className="flex items-center gap-2 text-sm"><Switch checked={edit.canSelfVerify} onCheckedChange={(canSelfVerify) => setEdit({ ...edit, canSelfVerify })} />Senior technician — may verify own results</label>
-            <div className="space-y-1.5"><Label>Reset password (optional)</Label><Input value={edit.newPassword} onChange={(e) => setEdit({ ...edit, newPassword: e.target.value })} placeholder="New password, min. 8 characters" /></div>
+            <div className="space-y-1.5"><Label>Reset password (optional)</Label><Input value={edit.newPassword} onChange={(e) => setEdit({ ...edit, newPassword: e.target.value })} placeholder="Min. 10 characters, letters and numbers" /></div>
             <Button className="w-full" onClick={save}>Save</Button>
           </div>}
         </DialogContent>

@@ -15,7 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { requireArea } from "@/lib/auth";
 import { APPT_STATUS_LABEL, LAB_STATUS_LABEL, VISIT_STATUS_LABEL } from "@/lib/data";
 import { fmtDateTime } from "@/lib/opd-queries";
-import { defaultRange, downloadCsv, fmtMinutes, pct, rangeProblem, toCsv } from "@/lib/reports";
+import { defaultRange, downloadCsv, searchDate, fmtMinutes, pct, rangeProblem, toCsv } from "@/lib/reports";
 import { money, PAYMENT_METHOD_LABEL } from "@/lib/billing";
 import { ROLE_LABELS, type AppRole } from "@/lib/workflow";
 
@@ -31,13 +31,13 @@ const TABS = {
 } as const;
 type Tab = keyof typeof TABS;
 
-type Search = { tab?: Tab; from?: string; to?: string };
+type Search = { tab?: Tab | undefined; from?: string | undefined; to?: string | undefined };
 
 export const Route = createFileRoute("/_authenticated/admin/reports")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    tab: typeof s.tab === "string" && s.tab in TABS ? (s.tab as Tab) : undefined,
-    from: typeof s.from === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.from) ? s.from : undefined,
-    to: typeof s.to === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.to) ? s.to : undefined,
+    tab: typeof s["tab"] === "string" && s["tab"] in TABS ? (s["tab"] as Tab) : undefined,
+    from: searchDate(s["from"]),
+    to: searchDate(s["to"]),
   }),
   beforeLoad: requireArea("admin"),
   head: () => ({
