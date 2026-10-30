@@ -19,13 +19,14 @@ function Dashboard() {
   const { data: me } = useStaff();
   const { data: services } = useServices();
   const roles = me?.roles ?? [];
+  const isAdmin = roles.includes("admin");
   const seesLab = canAccess(roles, "lab") || canAccess(roles, "opd");
   useLiveTable("visits", [["dash"]]);
   useLiveTable("lab_request_items", [["dash"]]);
 
   const { data, error, refetch, isLoading } = useQuery({
     queryKey: ["dash", seesLab],
-    enabled: !!me,
+    enabled: !!me && !isAdmin,
     queryFn: async () => {
       const d = today();
       const [{ data: visits, error: ve }, { count: newPatients }, labs] = await Promise.all([
@@ -86,8 +87,9 @@ function Dashboard() {
           );
         })}
       </div>
-      {error && <div className="mb-4"><LoadError onRetry={() => refetch()} /></div>}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      {isAdmin && <ManagementSummary />}
+      {!isAdmin && error && <div className="mb-4"><LoadError onRetry={() => refetch()} /></div>}
+      {!isAdmin && <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {stats.map((s) => (
           <Card key={s.label}>
             <CardContent className="flex items-center gap-3 p-4">
@@ -99,9 +101,9 @@ function Dashboard() {
             </CardContent>
           </Card>
         ))}
-      </div>
+      </div>}
       <div className="mt-5 grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        {!isAdmin && <Card className="lg:col-span-2">
           <CardHeader><CardTitle className="text-base">Today's visits by service</CardTitle></CardHeader>
           <CardContent className="space-y-2">
             {v.length === 0 && !isLoading && <p className="text-sm text-muted-foreground">No visits recorded today yet.</p>}
@@ -118,8 +120,8 @@ function Dashboard() {
               );
             })}
           </CardContent>
-        </Card>
-        <Card>
+        </Card>}
+        <Card className={isAdmin ? "lg:col-span-3" : ""}>
           <CardHeader><CardTitle className="text-base">Quick actions</CardTitle></CardHeader>
           <CardContent className="flex flex-col gap-2 text-sm">
             {canAccess(roles, "reception") && <>
@@ -128,11 +130,94 @@ function Dashboard() {
             </>}
             {canAccess(roles, "opd") && <Link className="text-primary hover:underline" to="/opd">Open OPD queue</Link>}
             {canAccess(roles, "lab") && <Link className="text-primary hover:underline" to="/lab">Open lab worklist</Link>}
-            {canAccess(roles, "admin") && <Link className="text-primary hover:underline" to="/admin/staff">Manage staff accounts</Link>}
+            {canAccess(roles, "admin") && <>
+              <Link className="text-primary hover:underline" to="/admin/reports" search={{ tab: "registrations" }}>Open reports</Link>
+              <Link className="text-primary hover:underline" to="/admin/staff">Manage staff accounts</Link>
+            </>}
+            {canAccess(roles, "billing") && <Link className="text-primary hover:underline" to="/billing">Billing</Link>}
             <Link className="text-primary hover:underline" to="/profile">My profile</Link>
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+type Summary = {
+  day: string; total_patients: number; archived_patients: number; new_registrations: number; opd_visits: number; waiting: number;
+  in_clinic: number; completed_visits: number; signed_consultations: number; lab_requests: number; lab_tests_requested: number;
+  lab_processing: number; awaiting_verification: number; verified_results: number;
+  by_service: { key: string; name: string; visits: number; completed: number }[];
+};
+
+/** Administrator view: live counts from the database (function report_admin_summary). */
+function ManagementSummary() {
+  useLiveTable("visits", [["admin_summary"]]);
+  useLiveTable("lab_request_items", [["admin_summary"]]);
+  const { data, error, isLoading, refetch } = useQuery({
+    queryKey: ["admin_summary"],
+    refetchInterval: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("report_admin_summary", {} as never);
+      if (error) throw error;
+      return data as unknown as Summary;
+    },
+  });
+  if (error) return <div className="mb-4"><LoadError message={(error as Error).message} onRetry={() => refetch()} /></div>;
+  const d = data;
+  const groups: { title: string; items: { label: string; value: number | undefined; warn?: boolean }[] }[] = [
+    { title: "Patients", items: [
+      { label: "Registered patients", value: d?.total_patients },
+      { label: "New registrations today", value: d?.new_registrations },
+    ] },
+    { title: "OPD today", items: [
+      { label: "OPD visits", value: d?.opd_visits },
+      { label: "Waiting now", value: d?.waiting },
+      { label: "In consultation / lab", value: d?.in_clinic },
+      { label: "Completed visits", value: d?.completed_visits },
+      { label: "Consultations signed", value: d?.signed_consultations },
+    ] },
+    { title: "Laboratory", items: [
+      { label: "Lab requests today", value: d?.lab_requests },
+      { label: "Tests in progress", value: d?.lab_processing },
+      { label: "Awaiting verification", value: d?.awaiting_verification, warn: (d?.awaiting_verification ?? 0) > 0 },
+      { label: "Verified today", value: d?.verified_results },
+    ] },
+  ];
+  const max = Math.max(1, ...(d?.by_service ?? []).map((s) => s.visits));
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-4 xl:grid-cols-3">
+        {groups.map((g) => (
+          <Card key={g.title}>
+            <CardHeader className="pb-2"><CardTitle className="text-sm uppercase tracking-wide text-muted-foreground">{g.title}</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-2 gap-3">
+              {g.items.map((i) => (
+                <div key={i.label} className="rounded-md bg-secondary/60 p-3">
+                  <div className={`text-2xl font-bold tabular-nums ${i.warn ? "text-destructive" : "text-primary"}`}>{isLoading ? "…" : i.value ?? 0}</div>
+                  <div className="text-xs text-muted-foreground">{i.label}</div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      <Card>
+        <CardHeader className="flex-row items-center justify-between space-y-0">
+          <CardTitle className="text-base">Today's visits by clinical service</CardTitle>
+          <Link to="/admin/reports" search={{ tab: "services" }} className="text-sm text-primary hover:underline">Service report →</Link>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          {d && d.opd_visits === 0 && <p className="text-sm text-muted-foreground">No visits recorded today yet.</p>}
+          {(d?.by_service ?? []).map((s) => (
+            <div key={s.key} className="flex items-center gap-3 text-sm">
+              <div className="w-28 shrink-0 truncate sm:w-56" title={s.name}>{s.name}</div>
+              <div className="h-3 flex-1 rounded bg-muted"><div className="h-3 rounded bg-primary" style={{ width: `${(s.visits / max) * 100}%` }} /></div>
+              <div className="w-16 text-right text-xs"><span className="font-semibold">{s.visits}</span> <span className="text-muted-foreground">({s.completed} done)</span></div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
     </div>
   );
 }
