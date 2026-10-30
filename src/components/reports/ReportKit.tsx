@@ -29,14 +29,14 @@ export function ReportTable<T extends Record<string, unknown>>({
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>{columns.map((c) => <TableHead key={c.key} className={c.align === "right" ? "text-right" : ""}>{c.label}</TableHead>)}</TableRow>
+              <TableRow>{columns.map((c, ci) => <TableHead key={`${c.key}-${ci}`} className={c.align === "right" ? "text-right" : ""}>{c.label}</TableHead>)}</TableRow>
             </TableHeader>
             <TableBody>
               {rows.length === 0 && <TableRow><TableCell colSpan={columns.length} className="py-6 text-center text-sm text-muted-foreground">{empty}</TableCell></TableRow>}
               {rows.map((r, i) => (
                 <TableRow key={i}>
-                  {columns.map((c) => (
-                    <TableCell key={c.key} className={`text-sm ${c.align === "right" ? "text-right tabular-nums" : ""}`}>
+                  {columns.map((c, ci) => (
+                    <TableCell key={`${c.key}-${ci}`} className={`text-sm ${c.align === "right" ? "text-right tabular-nums" : ""}`}>
                       {c.format ? c.format(r[c.key], r) : String(r[c.key] ?? "—")}
                     </TableCell>
                   ))}
