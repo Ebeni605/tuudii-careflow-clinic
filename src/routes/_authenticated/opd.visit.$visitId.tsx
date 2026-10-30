@@ -24,7 +24,7 @@ import { patientName, today, useLiveTable, useServices, useStaffNames } from "@/
 import { consultQuery, dxQuery, fmtDate, fmtDateTime, fmtTime, visitLabsQuery, visitQuery } from "@/lib/opd-queries";
 import { useStaff, requireArea } from "@/lib/auth";
 import { templateFor, type TemplateField } from "@/lib/templates";
-import { ageFromDob, ancEstimates, canCompleteVisit, OPEN_ENCOUNTER_STATUSES, signingProblems, type VisitStatus } from "@/lib/workflow";
+import { ageFromDob, ancEstimates, canCompleteVisit, isLabFinal, OPEN_ENCOUNTER_STATUSES, signingProblems, type VisitStatus } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/opd/visit/$visitId")({
   beforeLoad: requireArea("opd"),
