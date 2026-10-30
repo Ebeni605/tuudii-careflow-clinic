@@ -1,3 +1,4 @@
+import { cloneElement, isValidElement, useId } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,11 +7,19 @@ import { Textarea } from "@/components/ui/textarea";
 import type { TemplateField } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
+/** Labelled form field. Links the label to a single input/textarea child so it is read out and clickable. */
 export function F({ label, children, className, required }: { label: string; children: React.ReactNode; className?: string | undefined; required?: boolean | undefined }) {
+  const autoId = useId();
+  let id: string | undefined;
+  let child = children;
+  if (isValidElement<{ id?: string }>(children) && (children.type === Input || children.type === Textarea)) {
+    id = children.props.id ?? autoId;
+    child = cloneElement(children, { id });
+  }
   return (
     <div className={cn("space-y-1.5", className)}>
-      <Label>{label}{required && <span className="ml-0.5 text-destructive" aria-label="required">*</span>}</Label>
-      {children}
+      <Label htmlFor={id}>{label}{required && <span className="ml-0.5 text-destructive" aria-hidden="true">*</span>}</Label>
+      {child}
     </div>
   );
 }
