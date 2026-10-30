@@ -12,7 +12,7 @@ import { useLabTests } from "@/lib/data";
 // Column layout copied from the clinic's paper Laboratory Request form.
 export const FORM_COLUMNS = [
   ["Hematology", "Bacteriology & Parasitology"],
-  ["Serology", "Urine Analysis", "Microscopy"],
+  ["Serology", "Urine Analysis", "Microscopy Examination"],
 ];
 
 /** Sends one laboratory order (several tests) for the visit; the database links it to the patient, visit and consultation. */
@@ -68,7 +68,7 @@ export function LabRequestForm({ visitId, onDone }: { visitId: string; onDone?: 
                   <div className="bg-secondary px-3 py-1.5 text-sm font-bold uppercase tracking-wide text-secondary-foreground">{section}</div>
                   <div className="space-y-1 p-2">
                     {panels.map((p) => (
-                      <button key={p} type="button" onClick={() => togglePanel(p)} className="mb-1 mr-1 rounded border border-primary/40 px-2 py-0.5 text-xs font-semibold text-primary hover:bg-primary/10">+ Full {p}</button>
+                      <button key={p} type="button" onClick={() => togglePanel(p)} className="mb-1 mr-1 rounded border border-primary/40 px-2 py-0.5 text-xs font-semibold text-primary hover:bg-primary/10">☐ {p} (full panel)</button>
                     ))}
                     {items.map((t) => (
                       <label key={t.id} className="flex cursor-pointer items-center gap-2 rounded px-1 py-0.5 text-sm hover:bg-muted">
