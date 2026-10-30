@@ -125,8 +125,9 @@ export const updateStaff = createServerFn({ method: "POST" })
     if (pe) throw new Error(pe.message);
     const { data: current, error: ce } = await db.from("user_roles").select("role").eq("user_id", data.userId);
     if (ce) throw new Error(ce.message);
-    const have = new Set<string>((current ?? []).map((r: { role: string }) => r.role));
-    const want = new Set<string>(data.roles);
+    type Role = "admin" | "receptionist" | "clinician" | "lab_tech";
+    const have = new Set<Role>((current ?? []).map((r) => r.role as Role));
+    const want = new Set<Role>(data.roles as Role[]);
     const remove = [...have].filter((r) => !want.has(r));
     const add = [...want].filter((r) => !have.has(r));
     if (remove.length) {
