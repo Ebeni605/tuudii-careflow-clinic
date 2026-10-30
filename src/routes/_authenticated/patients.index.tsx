@@ -10,9 +10,10 @@ import { PageHeader, RequireArea } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName } from "@/lib/data";
 import { ageFromDob, canAccess } from "@/lib/workflow";
-import { useStaff } from "@/lib/auth";
+import { useStaff, requireArea } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
+  beforeLoad: requireArea("patients"),
   head: () => ({ meta: [{ title: "Patients — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="patients"><Patients /></RequireArea>,
 });

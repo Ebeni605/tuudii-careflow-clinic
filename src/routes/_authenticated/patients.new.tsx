@@ -4,10 +4,12 @@ import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader, RequireArea } from "@/components/AppShell";
+import { requireArea } from "@/lib/auth";
 import { PatientForm, toPatientRow } from "@/components/PatientForm";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/patients/new")({
+  beforeLoad: requireArea("reception"),
   head: () => ({ meta: [{ title: "Register Patient — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="reception"><NewPatient /></RequireArea>,
 });

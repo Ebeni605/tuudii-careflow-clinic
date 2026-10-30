@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader, RequireArea } from "@/components/AppShell";
+import { requireArea } from "@/lib/auth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, today, useLiveTable, useStaffNames } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/lab/")({
+  beforeLoad: requireArea("lab"),
   head: () => ({ meta: [{ title: "Lab Worklist — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="lab"><Worklist /></RequireArea>,
 });

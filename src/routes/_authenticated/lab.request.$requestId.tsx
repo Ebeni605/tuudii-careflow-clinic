@@ -10,10 +10,11 @@ import { PageHeader, RequireArea } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, useLiveTable, useStaffNames } from "@/lib/data";
-import { useStaff } from "@/lib/auth";
+import { useStaff, requireArea } from "@/lib/auth";
 import { abnormalFlag, ageFromDob, canVerify } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/lab/request/$requestId")({
+  beforeLoad: requireArea("lab"),
   head: () => ({ meta: [{ title: "Lab Request — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="lab"><LabRequest /></RequireArea>,
 });

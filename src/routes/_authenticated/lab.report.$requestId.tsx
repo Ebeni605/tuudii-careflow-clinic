@@ -4,11 +4,13 @@ import { Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PrintHeader } from "@/components/ClinicBrand";
 import { RequireArea } from "@/components/AppShell";
+import { requireArea } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, useStaffNames } from "@/lib/data";
 import { ageFromDob } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/lab/report/$requestId")({
+  beforeLoad: requireArea("patients"),
   head: () => ({ meta: [{ title: "Laboratory Report — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="patients"><Report /></RequireArea>,
 });

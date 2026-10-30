@@ -10,10 +10,11 @@ import { PageHeader, RequireArea } from "@/components/AppShell";
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, today, useLiveTable, useServices } from "@/lib/data";
-import { useStaff } from "@/lib/auth";
+import { useStaff, requireArea } from "@/lib/auth";
 import { ageFromDob } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/opd/")({
+  beforeLoad: requireArea("opd"),
   head: () => ({ meta: [{ title: "OPD Queue — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="opd"><OpdQueue /></RequireArea>,
 });

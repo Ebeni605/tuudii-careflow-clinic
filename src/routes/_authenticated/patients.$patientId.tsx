@@ -13,10 +13,11 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { PrintHeader } from "@/components/ClinicBrand";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, useServices } from "@/lib/data";
-import { useStaff } from "@/lib/auth";
+import { useStaff, requireArea } from "@/lib/auth";
 import { ageFromDob, canAccess } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/patients/$patientId")({
+  beforeLoad: requireArea("patients"),
   head: () => ({ meta: [{ title: "Patient Record — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="patients"><PatientProfile /></RequireArea>,
 });
