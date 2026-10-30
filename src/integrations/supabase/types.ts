@@ -376,62 +376,99 @@ export type Database = {
       lab_request_items: {
         Row: {
           abnormal_flag: string | null
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
           collected_at: string | null
           collected_by: string | null
+          current_specimen_id: string | null
           id: string
           lab_request_id: string
           lab_test_id: string
           processed_at: string | null
           processed_by: string | null
+          received_at: string | null
+          received_by: string | null
           rejection_reason: string | null
           result_comment: string | null
           result_value: string | null
           resulted_at: string | null
           resulted_by: string | null
+          returned_reason: string | null
           specimen_id: string | null
           status: string
+          submitted_at: string | null
+          submitted_by: string | null
+          updated_at: string
           verified_at: string | null
           verified_by: string | null
         }
         Insert: {
           abnormal_flag?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           collected_at?: string | null
           collected_by?: string | null
+          current_specimen_id?: string | null
           id?: string
           lab_request_id: string
           lab_test_id: string
           processed_at?: string | null
           processed_by?: string | null
+          received_at?: string | null
+          received_by?: string | null
           rejection_reason?: string | null
           result_comment?: string | null
           result_value?: string | null
           resulted_at?: string | null
           resulted_by?: string | null
+          returned_reason?: string | null
           specimen_id?: string | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
+          updated_at?: string
           verified_at?: string | null
           verified_by?: string | null
         }
         Update: {
           abnormal_flag?: string | null
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
           collected_at?: string | null
           collected_by?: string | null
+          current_specimen_id?: string | null
           id?: string
           lab_request_id?: string
           lab_test_id?: string
           processed_at?: string | null
           processed_by?: string | null
+          received_at?: string | null
+          received_by?: string | null
           rejection_reason?: string | null
           result_comment?: string | null
           result_value?: string | null
           resulted_at?: string | null
           resulted_by?: string | null
+          returned_reason?: string | null
           specimen_id?: string | null
           status?: string
+          submitted_at?: string | null
+          submitted_by?: string | null
+          updated_at?: string
           verified_at?: string | null
           verified_by?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "lab_request_items_current_specimen_id_fkey"
+            columns: ["current_specimen_id"]
+            isOneToOne: false
+            referencedRelation: "lab_specimens"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lab_request_items_lab_request_id_fkey"
             columns: ["lab_request_id"]
@@ -509,9 +546,277 @@ export type Database = {
           },
         ]
       }
+      lab_result_amendments: {
+        Row: {
+          amended_by: string | null
+          created_at: string
+          id: string
+          item_id: string
+          lab_request_id: string
+          patient_id: string
+          previous_comment: string | null
+          previous_entered_at: string | null
+          previous_entered_by: string | null
+          previous_flag: string | null
+          previous_ref_high: number | null
+          previous_ref_low: number | null
+          previous_ref_text: string | null
+          previous_unit: string | null
+          previous_value: string | null
+          previous_verified_at: string | null
+          previous_verified_by: string | null
+          reason: string
+        }
+        Insert: {
+          amended_by?: string | null
+          created_at?: string
+          id?: string
+          item_id: string
+          lab_request_id: string
+          patient_id: string
+          previous_comment?: string | null
+          previous_entered_at?: string | null
+          previous_entered_by?: string | null
+          previous_flag?: string | null
+          previous_ref_high?: number | null
+          previous_ref_low?: number | null
+          previous_ref_text?: string | null
+          previous_unit?: string | null
+          previous_value?: string | null
+          previous_verified_at?: string | null
+          previous_verified_by?: string | null
+          reason: string
+        }
+        Update: {
+          amended_by?: string | null
+          created_at?: string
+          id?: string
+          item_id?: string
+          lab_request_id?: string
+          patient_id?: string
+          previous_comment?: string | null
+          previous_entered_at?: string | null
+          previous_entered_by?: string | null
+          previous_flag?: string | null
+          previous_ref_high?: number | null
+          previous_ref_low?: number | null
+          previous_ref_text?: string | null
+          previous_unit?: string | null
+          previous_value?: string | null
+          previous_verified_at?: string | null
+          previous_verified_by?: string | null
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_result_amendments_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "lab_request_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_result_amendments_lab_request_id_fkey"
+            columns: ["lab_request_id"]
+            isOneToOne: false
+            referencedRelation: "lab_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_result_amendments_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_results: {
+        Row: {
+          abnormal_flag: string | null
+          comment: string | null
+          created_at: string
+          entered_at: string
+          entered_by: string | null
+          id: string
+          item_id: string
+          ref_high: number | null
+          ref_low: number | null
+          ref_text: string | null
+          unit: string | null
+          value: string
+        }
+        Insert: {
+          abnormal_flag?: string | null
+          comment?: string | null
+          created_at?: string
+          entered_at?: string
+          entered_by?: string | null
+          id?: string
+          item_id: string
+          ref_high?: number | null
+          ref_low?: number | null
+          ref_text?: string | null
+          unit?: string | null
+          value: string
+        }
+        Update: {
+          abnormal_flag?: string | null
+          comment?: string | null
+          created_at?: string
+          entered_at?: string
+          entered_by?: string | null
+          id?: string
+          item_id?: string
+          ref_high?: number | null
+          ref_low?: number | null
+          ref_text?: string | null
+          unit?: string | null
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_results_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: true
+            referencedRelation: "lab_request_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_specimen_tests: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          specimen_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          specimen_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          specimen_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_specimen_tests_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "lab_request_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_specimen_tests_specimen_id_fkey"
+            columns: ["specimen_id"]
+            isOneToOne: false
+            referencedRelation: "lab_specimens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lab_specimens: {
+        Row: {
+          accession_number: string | null
+          collected_at: string
+          collected_by: string | null
+          condition: string | null
+          created_at: string
+          id: string
+          lab_request_id: string
+          notes: string | null
+          patient_id: string
+          received_at: string | null
+          received_by: string | null
+          recorded_by: string | null
+          rejected_at: string | null
+          rejected_by: string | null
+          rejection_reason: string | null
+          replaces_specimen_id: string | null
+          specimen_type: string
+          status: string
+        }
+        Insert: {
+          accession_number?: string | null
+          collected_at?: string
+          collected_by?: string | null
+          condition?: string | null
+          created_at?: string
+          id?: string
+          lab_request_id: string
+          notes?: string | null
+          patient_id: string
+          received_at?: string | null
+          received_by?: string | null
+          recorded_by?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          replaces_specimen_id?: string | null
+          specimen_type: string
+          status?: string
+        }
+        Update: {
+          accession_number?: string | null
+          collected_at?: string
+          collected_by?: string | null
+          condition?: string | null
+          created_at?: string
+          id?: string
+          lab_request_id?: string
+          notes?: string | null
+          patient_id?: string
+          received_at?: string | null
+          received_by?: string | null
+          recorded_by?: string | null
+          rejected_at?: string | null
+          rejected_by?: string | null
+          rejection_reason?: string | null
+          replaces_specimen_id?: string | null
+          specimen_type?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lab_specimens_collected_by_fkey"
+            columns: ["collected_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_specimens_lab_request_id_fkey"
+            columns: ["lab_request_id"]
+            isOneToOne: false
+            referencedRelation: "lab_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_specimens_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lab_specimens_replaces_specimen_id_fkey"
+            columns: ["replaces_specimen_id"]
+            isOneToOne: false
+            referencedRelation: "lab_specimens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lab_tests: {
         Row: {
+          abnormal_options: string[] | null
           active: boolean
+          catalogue_note: string | null
           code: string
           display_order: number
           id: string
@@ -520,13 +825,19 @@ export type Database = {
           ref_high: number | null
           ref_low: number | null
           ref_text: string | null
+          reference_source: string | null
+          reference_updated_at: string | null
+          reference_updated_by: string | null
+          result_options: string[] | null
           result_type: string
           section: string
           specimen_type: string | null
           unit: string | null
         }
         Insert: {
+          abnormal_options?: string[] | null
           active?: boolean
+          catalogue_note?: string | null
           code: string
           display_order?: number
           id?: string
@@ -535,13 +846,19 @@ export type Database = {
           ref_high?: number | null
           ref_low?: number | null
           ref_text?: string | null
+          reference_source?: string | null
+          reference_updated_at?: string | null
+          reference_updated_by?: string | null
+          result_options?: string[] | null
           result_type?: string
           section: string
           specimen_type?: string | null
           unit?: string | null
         }
         Update: {
+          abnormal_options?: string[] | null
           active?: boolean
+          catalogue_note?: string | null
           code?: string
           display_order?: number
           id?: string
@@ -550,6 +867,10 @@ export type Database = {
           ref_high?: number | null
           ref_low?: number | null
           ref_text?: string | null
+          reference_source?: string | null
+          reference_updated_at?: string | null
+          reference_updated_by?: string | null
+          result_options?: string[] | null
           result_type?: string
           section?: string
           specimen_type?: string | null
@@ -727,6 +1048,7 @@ export type Database = {
         Row: {
           active: boolean
           can_self_verify: boolean
+          can_verify_lab: boolean
           created_at: string
           full_name: string
           id: string
@@ -735,6 +1057,7 @@ export type Database = {
         Insert: {
           active?: boolean
           can_self_verify?: boolean
+          can_verify_lab?: boolean
           created_at?: string
           full_name?: string
           id: string
@@ -743,6 +1066,7 @@ export type Database = {
         Update: {
           active?: boolean
           can_self_verify?: boolean
+          can_verify_lab?: boolean
           created_at?: string
           full_name?: string
           id?: string
@@ -944,7 +1268,25 @@ export type Database = {
     }
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
+      amend_lab_result: {
+        Args: { _item_id: string; _reason: string }
+        Returns: undefined
+      }
+      can_verify_lab: { Args: { _user_id: string }; Returns: boolean }
       clinic_today: { Args: never; Returns: string }
+      collect_specimen: {
+        Args: {
+          _collected_at?: string
+          _collected_by?: string
+          _condition?: string
+          _item_ids: string[]
+          _notes?: string
+          _received?: boolean
+          _request_id: string
+          _specimen_type: string
+        }
+        Returns: Json
+      }
       create_lab_order: {
         Args: {
           _notes?: string
@@ -984,6 +1326,23 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      receive_specimen: {
+        Args: { _condition: string; _notes?: string; _specimen_id: string }
+        Returns: undefined
+      }
+      reject_specimen: {
+        Args: { _condition?: string; _reason: string; _specimen_id: string }
+        Returns: undefined
+      }
+      save_lab_result: {
+        Args: {
+          _comment?: string
+          _flag?: string
+          _item_id: string
+          _value: string
+        }
+        Returns: Json
+      }
       update_my_profile: {
         Args: { _full_name: string; _phone: string }
         Returns: undefined
