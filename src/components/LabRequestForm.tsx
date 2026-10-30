@@ -15,7 +15,8 @@ export const FORM_COLUMNS = [
   ["Serology", "Urine Analysis", "Microscopy"],
 ];
 
-export function LabRequestForm({ visitId, patientId, onDone }: { visitId: string; patientId: string; onDone?: () => void }) {
+/** Sends one laboratory order (several tests) for the visit; the database links it to the patient, visit and consultation. */
+export function LabRequestForm({ visitId, onDone }: { visitId: string; onDone?: () => void }) {
   const { data: tests } = useLabTests();
   const [picked, setPicked] = useState<Set<string>>(new Set());
   const [urgent, setUrgent] = useState(false);
@@ -26,7 +27,7 @@ export function LabRequestForm({ visitId, patientId, onDone }: { visitId: string
 
   function toggle(id: string) {
     const n = new Set(picked);
-    n.has(id) ? n.delete(id) : n.add(id);
+    if (n.has(id)) n.delete(id); else n.add(id);
     setPicked(n);
   }
   function togglePanel(panel: string) {
@@ -40,17 +41,17 @@ export function LabRequestForm({ visitId, patientId, onDone }: { visitId: string
   async function submit() {
     if (!picked.size) { toast.error("Tick at least one test"); return; }
     setBusy(true);
-    const { data: req, error } = await supabase.from("lab_requests")
-      .insert({ visit_id: visitId, patient_id: patientId, priority: urgent ? "urgent" : "routine", clinical_notes: notes || null })
-      .select("id, request_number").single();
-    if (error) { setBusy(false); { toast.error(error.message); return; } }
-    const { error: e2 } = await supabase.from("lab_request_items").insert([...picked].map((id) => ({ lab_request_id: req.id, lab_test_id: id })));
-    if (!e2) await supabase.from("visits").update({ status: "awaiting_lab" }).eq("id", visitId);
+    const { data, error } = await supabase.rpc("create_lab_order", {
+      _visit_id: visitId, _test_ids: [...picked], _priority: urgent ? "urgent" : "routine", _notes: notes.trim(),
+    });
     setBusy(false);
-    if (e2) { toast.error(e2.message); return; }
-    toast.success(`Lab request ${req.request_number} sent to laboratory`);
+    if (error) { toast.error(error.message); return; }
+    const no = (data as { request_number?: string } | null)?.request_number ?? "";
+    toast.success(`Lab order ${no} sent to the laboratory`);
     setPicked(new Set()); setNotes(""); setUrgent(false);
-    qc.invalidateQueries();
+    qc.invalidateQueries({ queryKey: ["visit_labs", visitId] });
+    qc.invalidateQueries({ queryKey: ["visit", visitId] });
+    qc.invalidateQueries({ queryKey: ["opd_queue"] });
     onDone?.();
   }
 
@@ -83,7 +84,7 @@ export function LabRequestForm({ visitId, patientId, onDone }: { visitId: string
         ))}
       </div>
       <div className="grid gap-3 md:grid-cols-[1fr_auto] md:items-end">
-        <div className="space-y-1.5"><Label>Clinical notes for the laboratory</Label><Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500} /></div>
+        <div className="space-y-1.5"><Label htmlFor="lab-indication">Clinical indication for the laboratory</Label><Textarea id="lab-indication" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={500} /></div>
         <label className="flex items-center gap-2 text-sm font-medium"><Switch checked={urgent} onCheckedChange={setUrgent} /> Urgent</label>
       </div>
       <Button onClick={submit} disabled={busy}>{busy ? "Sending…" : `Send ${picked.size || ""} test(s) to laboratory`}</Button>
