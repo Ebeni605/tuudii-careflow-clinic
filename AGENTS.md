@@ -12,7 +12,8 @@
 # Project rules
 
 - Departments are Reception, OPD, Laboratory (+ Admin); clinical services are categories (`service_categories`), never separate departments — keeps one shared patient record.
-- Roles live only in `user_roles`; access is enforced by RLS via `has_role`/`has_any_role`/`is_staff` — UI checks (`canAccess` in `src/lib/workflow.ts`) only hide controls.
+- Roles live only in `user_roles`; access is enforced by RLS via `has_role`/`has_any_role`/`is_staff` (disabled profiles count as no role). Every page under `_authenticated` sets `beforeLoad: requireArea(area)` (redirects to `/no-access`); `canAccess` in `src/lib/workflow.ts` defines areas and only drives UI.
+- Staff edit only their own name/phone through the `update_my_profile` RPC; `profiles` UPDATE stays admin-only so staff can't change their own active/self-verify flags.
 - Visit and lab-item status transitions and stamps (who/when, MRN, queue number, request number) are set by DB triggers; `src/lib/workflow.ts` mirrors them for UI and is unit-tested — change both together.
 - Clinicians see lab results only when an item is `verified`; verifier must differ from the result enterer unless `profiles.can_self_verify`.
 - Staff accounts are created only by admin via server functions in `src/lib/admin.functions.ts` (service role loaded inside handlers); public signup is disabled; `bootstrapAdmin` works only while no admin exists.
