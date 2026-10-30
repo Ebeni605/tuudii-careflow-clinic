@@ -57,6 +57,20 @@
       "when": 1793372838653,
       "tag": "0007_phase4_tighten_lab_grants",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793388142137,
+      "tag": "0008_phase5_reports_billing_security",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793388578196,
+      "tag": "0009_phase5_revoke_anon_table_access",
+      "breakpoints": true
     }
   ]
 }

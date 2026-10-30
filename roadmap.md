@@ -1,19 +1,19 @@
 # Roadmap
 
 ## Phase 3 — OPD (done)
-- [x] Encounter, vitals, diagnoses, medicines, lab orders, signing, amendments, OPD dashboard, tests
-
 ## Phase 4 — Laboratory (done)
-- [x] Database: specimens with accession numbers + recollection history, separate results table (clinicians see only verified), result amendments, new test statuses, verification permission, DB-set abnormal flags, reference snapshot on each result
-- [x] Catalogue: names as on paper form (B/F, BF kept), clear invented ranges/units, result types (numeric/qualitative/text/microscopy), admin add/edit
-- [x] Lab dashboard (8 counts, filters: date, patient ID, name, category, status)
-- [x] Request page (patient/encounter details, specimens, independent test progress, result entry by type, submit, cancel)
-- [x] Separate verification page; correction of verified result with reason + re-verification
-- [x] A4 report (final vs incomplete, specimens, performed/verified by, signature area)
-- [x] OPD: results from new results table, correction status, results-ready indicator
-- [x] Admin staff: "may verify lab results" switch
-- [x] Unit tests + permission tests per role + browser walkthrough
 
-## Later
+## Phase 5 — Integration, reports, billing, security, go-live prep
+- [ ] A. Integration: duplicate lab-order guard (same test still open on the visit), row lock against concurrent orders
+- [ ] B. Admin management dashboard (live database counts)
+- [ ] B. Reports (7) with date filters, CSV export, print/PDF, pagination, no names in aggregates
+- [ ] C. Optional billing (off until admin enables): charges, invoices, items, payments, receipts, adjustments, outstanding, daily report
+- [ ] D. Security: revoke anonymous function access, attribute staff/permission changes in audit, server input validation, password reset, idle sign-out, audit page filters
+- [ ] E/G. Backup & recovery + deployment/rollback/admin setup guide (document only what is verified)
+- [ ] F. QA: full journey + role tests in database, browser walkthrough, mobile layout, printing
+- [ ] Final implementation report
+
+## Later / needs the clinic
 - Clinic to enter validated units/reference intervals; confirm meaning of B/F and BF
-- Phase 5: dashboards, print polish, security review
+- Clinic to approve prices + payment workflow before billing is switched on
+- Remove test accounts and fictional records before real use

@@ -111,6 +111,88 @@ export type Database = {
         }
         Relationships: []
       }
+      billing_adjustments: {
+        Row: {
+          amount: number
+          created_at: string
+          created_by: string | null
+          id: string
+          invoice_id: string
+          kind: string
+          payment_id: string | null
+          reason: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id: string
+          kind: string
+          payment_id?: string | null
+          reason: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          invoice_id?: string
+          kind?: string
+          payment_id?: string | null
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "billing_adjustments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "billing_adjustments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "billing_adjustments_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      billing_settings: {
+        Row: {
+          approval_note: string | null
+          currency: string
+          enabled: boolean
+          id: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          approval_note?: string | null
+          currency?: string
+          enabled?: boolean
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          approval_note?: string | null
+          currency?: string
+          enabled?: boolean
+          id?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       consultation_amendments: {
         Row: {
           consultation_id: string
@@ -372,6 +454,133 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      invoice_items: {
+        Row: {
+          charge_id: string | null
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          invoice_id: string
+          line_total: number | null
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          charge_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description: string
+          id?: string
+          invoice_id: string
+          line_total?: number | null
+          quantity?: number
+          unit_price: number
+        }
+        Update: {
+          charge_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          invoice_id?: string
+          line_total?: number | null
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_charge_id_fkey"
+            columns: ["charge_id"]
+            isOneToOne: false
+            referencedRelation: "service_charges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          currency: string
+          id: string
+          invoice_number: string | null
+          issued_at: string | null
+          issued_by: string | null
+          notes: string | null
+          patient_id: string
+          status: string
+          updated_at: string
+          visit_id: string | null
+          void_reason: string | null
+          voided_at: string | null
+          voided_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          invoice_number?: string | null
+          issued_at?: string | null
+          issued_by?: string | null
+          notes?: string | null
+          patient_id: string
+          status?: string
+          updated_at?: string
+          visit_id?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          id?: string
+          invoice_number?: string | null
+          issued_at?: string | null
+          issued_by?: string | null
+          notes?: string | null
+          patient_id?: string
+          status?: string
+          updated_at?: string
+          visit_id?: string | null
+          void_reason?: string | null
+          voided_at?: string | null
+          voided_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lab_request_items: {
         Row: {
@@ -1044,6 +1253,54 @@ export type Database = {
         }
         Relationships: []
       }
+      payments: {
+        Row: {
+          amount: number
+          id: string
+          invoice_id: string
+          method: string
+          receipt_number: string | null
+          received_at: string
+          received_by: string | null
+          reference: string | null
+        }
+        Insert: {
+          amount: number
+          id?: string
+          invoice_id: string
+          method: string
+          receipt_number?: string | null
+          received_at?: string
+          received_by?: string | null
+          reference?: string | null
+        }
+        Update: {
+          amount?: number
+          id?: string
+          invoice_id?: string
+          method?: string
+          receipt_number?: string | null
+          received_at?: string
+          received_by?: string | null
+          reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoice_balances"
+            referencedColumns: ["invoice_id"]
+          },
+          {
+            foreignKeyName: "payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           active: boolean
@@ -1094,6 +1351,63 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      service_charges: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          display_order: number
+          id: string
+          lab_test_id: string | null
+          name: string
+          price: number
+          service_key: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          lab_test_id?: string | null
+          name: string
+          price: number
+          service_key?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          lab_test_id?: string | null
+          name?: string
+          price?: number
+          service_key?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_charges_lab_test_id_fkey"
+            columns: ["lab_test_id"]
+            isOneToOne: false
+            referencedRelation: "lab_tests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_charges_service_key_fkey"
+            columns: ["service_key"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["key"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -1264,15 +1578,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      invoice_balances: {
+        Row: {
+          balance: number | null
+          discount: number | null
+          invoice_id: string | null
+          paid: number | null
+          total: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
+      age_band: { Args: { _dob: string; _on: string }; Returns: string }
       amend_lab_result: {
         Args: { _item_id: string; _reason: string }
         Returns: undefined
       }
+      billing_enabled: { Args: never; Returns: boolean }
       can_verify_lab: { Args: { _user_id: string }; Returns: boolean }
+      clinic_date: { Args: { _ts: string }; Returns: string }
       clinic_today: { Args: never; Returns: string }
       collect_specimen: {
         Args: {
@@ -1325,6 +1651,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      invoice_balance: { Args: { _invoice: string }; Returns: number }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       receive_specimen: {
         Args: { _condition: string; _notes?: string; _specimen_id: string }
@@ -1333,6 +1660,46 @@ export type Database = {
       reject_specimen: {
         Args: { _condition?: string; _reason: string; _specimen_id: string }
         Returns: undefined
+      }
+      report_admin_summary: { Args: { _day?: string }; Returns: Json }
+      report_appointments_queue: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      report_audit_events: {
+        Args: {
+          _action?: string
+          _from: string
+          _limit?: number
+          _offset?: number
+          _table?: string
+          _to: string
+          _user?: string
+        }
+        Returns: Json
+      }
+      report_billing: { Args: { _from: string; _to: string }; Returns: Json }
+      report_guard: { Args: { _from: string; _to: string }; Returns: undefined }
+      report_lab_turnaround: {
+        Args: { _from: string; _limit?: number; _offset?: number; _to: string }
+        Returns: Json
+      }
+      report_lab_volume: { Args: { _from: string; _to: string }; Returns: Json }
+      report_opd_attendance: {
+        Args: { _from: string; _group?: string; _to: string }
+        Returns: Json
+      }
+      report_registrations: {
+        Args: { _from: string; _limit?: number; _offset?: number; _to: string }
+        Returns: Json
+      }
+      report_service_utilization: {
+        Args: { _from: string; _to: string }
+        Returns: Json
+      }
+      report_staff_activity: {
+        Args: { _from: string; _to: string }
+        Returns: Json
       }
       save_lab_result: {
         Args: {
@@ -1345,6 +1712,10 @@ export type Database = {
       }
       update_my_profile: {
         Args: { _full_name: string; _phone: string }
+        Returns: undefined
+      }
+      void_invoice: {
+        Args: { _invoice_id: string; _reason: string }
         Returns: undefined
       }
     }
