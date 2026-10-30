@@ -2,12 +2,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { useServices } from "@/lib/data";
+import { today, useServices } from "@/lib/data";
+import { friendlyDbError } from "@/lib/patient-schema";
 
 export function CheckInDialog({ patientId, patientLabel, appointmentId, defaultService, trigger, onDone }: {
   patientId: string; patientLabel: string; appointmentId?: string; defaultService?: string;
@@ -23,16 +24,17 @@ export function CheckInDialog({ patientId, patientLabel, appointmentId, defaultS
   async function submit() {
     if (!service) { toast.error("Choose the reason for visit"); return; }
     setBusy(true);
+    // Queue number, visit date, check-in time and receptionist are set by the database.
     const { data, error } = await supabase.from("visits").insert({
-      patient_id: patientId, service_key: service, reception_notes: notes || null,
-      visit_type: appointmentId ? "appointment" : "walk_in", appointment_id: appointmentId ?? null,
+      patient_id: patientId, service_key: service, reception_notes: notes.trim() || null,
+      appointment_id: appointmentId ?? null,
     }).select("queue_number").single();
-    if (!error && appointmentId) await supabase.from("appointments").update({ status: "checked_in" }).eq("id", appointmentId);
     setBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(friendlyDbError(error.message)); return; }
     toast.success(`Checked in — queue number ${data.queue_number}`);
     qc.invalidateQueries();
     setOpen(false);
+    setNotes("");
     onDone?.();
   }
 
@@ -40,12 +42,15 @@ export function CheckInDialog({ patientId, patientLabel, appointmentId, defaultS
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{trigger ?? <Button size="sm">Check in</Button>}</DialogTrigger>
       <DialogContent>
-        <DialogHeader><DialogTitle>Check in {patientLabel}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Check in {patientLabel}</DialogTitle>
+          <DialogDescription>{appointmentId ? "Appointment check-in" : "Walk-in visit"} for today, {today()}. The patient joins the shared OPD waiting list.</DialogDescription>
+        </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Reason for visit / service</Label>
+            <Label>Reason for visit / service *</Label>
             <Select value={service} onValueChange={setService}>
-              <SelectTrigger><SelectValue placeholder="Select service" /></SelectTrigger>
+              <SelectTrigger aria-label="Service"><SelectValue placeholder="Select service" /></SelectTrigger>
               <SelectContent>{services?.map((s) => <SelectItem key={s.key} value={s.key}>{s.name}</SelectItem>)}</SelectContent>
             </Select>
           </div>
