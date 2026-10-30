@@ -125,8 +125,14 @@
   h1, h2, h3 { font-family: var(--font-display); letter-spacing: -0.01em; }
 }
 
+.a4-page { max-width: 210mm; }
+
+@page { size: A4; margin: 12mm; }
+
 @media print {
   .no-print { display: none !important; }
-  body { background: white; }
+  body { background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .print-area { box-shadow: none !important; border: none !important; }
+  .a4-page { max-width: none; width: 100%; padding: 0 !important; margin: 0 !important; }
+  .break-inside-avoid { break-inside: avoid; }
 }

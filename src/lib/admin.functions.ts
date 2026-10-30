@@ -83,6 +83,7 @@ export const listStaff = createServerFn({ method: "POST" })
         phone: p?.phone ?? "",
         active: p?.active ?? true,
         canSelfVerify: p?.can_self_verify ?? false,
+        canVerifyLab: p?.can_verify_lab ?? false,
         roles: (roles ?? []).filter((r) => r.user_id === u.id).map((r) => r.role as AppRole),
         lastSignIn: u.last_sign_in_at ?? null,
       };
@@ -91,7 +92,7 @@ export const listStaff = createServerFn({ method: "POST" })
 
 export const updateStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { userId: string; roles: AppRole[]; active: boolean; canSelfVerify: boolean; newPassword?: string }) => {
+  .inputValidator((d: { userId: string; roles: AppRole[]; active: boolean; canSelfVerify: boolean; canVerifyLab?: boolean; newPassword?: string }) => {
     if (d.newPassword) checkPassword(d.newPassword);
     return { ...d, roles: (d.roles ?? []).filter((r) => ROLES.includes(r)) };
   })
@@ -101,7 +102,7 @@ export const updateStaff = createServerFn({ method: "POST" })
       throw new Error("You cannot remove your own administrator access");
     }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    await supabaseAdmin.from("profiles").update({ active: data.active, can_self_verify: data.canSelfVerify }).eq("id", data.userId);
+    await supabaseAdmin.from("profiles").update({ active: data.active, can_self_verify: data.canSelfVerify, can_verify_lab: !!data.canVerifyLab }).eq("id", data.userId);
     await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
     if (data.roles.length) {
       await supabaseAdmin.from("user_roles").insert(data.roles.map((role) => ({ user_id: data.userId, role })));

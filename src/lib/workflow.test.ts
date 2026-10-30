@@ -2,22 +2,23 @@ import { describe, expect, it } from "vitest";
 import { abnormalFlag, canAccess, canLabMove, canVerify, canVisitMove, isResultVisibleToClinician } from "./workflow";
 
 describe("clinic workflow rules", () => {
-  it("lab results go requested → collected → processing → resulted → verified only", () => {
+  it("lab tests go requested → collected → received → processing → entered → awaiting verification → verified", () => {
     expect(canLabMove("requested", "collected")).toBe(true);
     expect(canLabMove("requested", "verified")).toBe(false);
-    expect(canLabMove("processing", "resulted")).toBe(true);
-    expect(canLabMove("resulted", "verified")).toBe(true);
+    expect(canLabMove("processing", "entered")).toBe(true);
+    expect(canLabMove("entered", "verified")).toBe(false);
+    expect(canLabMove("awaiting_verification", "verified")).toBe(true);
     expect(canLabMove("verified", "processing")).toBe(false);
   });
 
   it("the technician who entered a result cannot verify it unless allowed to self-verify", () => {
-    expect(canVerify({ resultedBy: "a", userId: "a", canSelfVerify: false })).toBe(false);
-    expect(canVerify({ resultedBy: "a", userId: "b", canSelfVerify: false })).toBe(true);
-    expect(canVerify({ resultedBy: "a", userId: "a", canSelfVerify: true })).toBe(true);
+    expect(canVerify({ enteredBy: "a", userId: "a", canVerifyLab: true, canSelfVerify: false })).toBe(false);
+    expect(canVerify({ enteredBy: "a", userId: "b", canVerifyLab: true, canSelfVerify: false })).toBe(true);
+    expect(canVerify({ enteredBy: "a", userId: "a", canVerifyLab: true, canSelfVerify: true })).toBe(true);
   });
 
   it("clinicians see a result only after verification", () => {
-    expect(isResultVisibleToClinician("resulted")).toBe(false);
+    expect(isResultVisibleToClinician("awaiting_verification")).toBe(false);
     expect(isResultVisibleToClinician("verified")).toBe(true);
   });
 

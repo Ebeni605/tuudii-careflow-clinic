@@ -24,7 +24,7 @@ import { patientName, today, useLiveTable, useServices, useStaffNames } from "@/
 import { consultQuery, dxQuery, fmtDate, fmtDateTime, fmtTime, visitLabsQuery, visitQuery } from "@/lib/opd-queries";
 import { useStaff, requireArea } from "@/lib/auth";
 import { templateFor, type TemplateField } from "@/lib/templates";
-import { ageFromDob, ancEstimates, canCompleteVisit, OPEN_ENCOUNTER_STATUSES, signingProblems, type VisitStatus } from "@/lib/workflow";
+import { ageFromDob, ancEstimates, canCompleteVisit, isLabFinal, OPEN_ENCOUNTER_STATUSES, signingProblems, type VisitStatus } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/opd/visit/$visitId")({
   beforeLoad: requireArea("opd"),
@@ -79,7 +79,7 @@ function Encounter() {
   const signed = consult?.status === "signed";
   const editable = isClinician && isOpen && !!consult && !signed;
   const allItems = (labs ?? []).flatMap((l) => l.lab_request_items);
-  const pendingLab = allItems.some((i) => i.status !== "verified" && i.status !== "rejected");
+  const pendingLab = allItems.some((i) => !isLabFinal(i.status));
   const problems = signingProblems({
     serviceKey: visit.service_key, chiefComplaint: form.chief_complaint, treatmentNotes: form.treatment_notes,
     diagnosisCount: dx?.length ?? 0, labOrderCount: labs?.length ?? 0, templateData: form.template_data,

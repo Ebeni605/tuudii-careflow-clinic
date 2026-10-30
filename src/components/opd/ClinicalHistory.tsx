@@ -23,7 +23,7 @@ export function ClinicalHistory({ patientId, currentVisitId }: { patientId: stri
           .eq("patient_id", patientId).order("checked_in_at", { ascending: false }).limit(30),
         supabase.from("vital_signs").select("*").eq("patient_id", patientId).order("recorded_at", { ascending: false }).limit(15),
         supabase.from("lab_requests")
-          .select("id, visit_id, request_number, created_at, lab_request_items(id, status, result_value, abnormal_flag, verified_at, lab_tests(name, unit))")
+          .select("id, visit_id, request_number, created_at, lab_request_items(id, status, verified_at, lab_tests(name), lab_results(value, abnormal_flag, unit))")
           .eq("patient_id", patientId).order("created_at", { ascending: false }).limit(30),
       ]);
       if (visits.error) throw visits.error;
@@ -75,7 +75,7 @@ export function ClinicalHistory({ patientId, currentVisitId }: { patientId: stri
                   <tr key={i.id}>
                     <td className="py-1 text-xs text-muted-foreground">{fmtDate(i.verified_at)}</td>
                     <td>{i.lab_tests?.name}</td>
-                    <td className={i.abnormal_flag ? "font-bold text-destructive" : "font-semibold"}>{i.result_value} {i.lab_tests?.unit} {i.abnormal_flag && `(${i.abnormal_flag})`}</td>
+                    <td className={i.lab_results?.abnormal_flag ? "font-bold text-destructive" : "font-semibold"}>{i.lab_results?.value ?? "—"} {i.lab_results?.unit} {i.lab_results?.abnormal_flag && `(${i.lab_results.abnormal_flag})`}</td>
                     <td className="text-right font-mono text-xs text-muted-foreground">{i.request.request_number}</td>
                   </tr>
                 ))}

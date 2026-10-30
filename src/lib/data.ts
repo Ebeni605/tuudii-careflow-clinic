@@ -50,7 +50,7 @@ export function useStaffNames() {
 }
 
 /** Invalidate the given query keys whenever rows change in a table. */
-export function useLiveTable(table: "visits" | "lab_request_items" | "lab_requests" | "appointments", keys: string[][]) {
+export function useLiveTable(table: "visits" | "lab_request_items" | "lab_requests" | "appointments" | "lab_specimens" | "lab_results", keys: string[][]) {
   const qc = useQueryClient();
   const sig = JSON.stringify(keys);
   useEffect(() => {
@@ -98,9 +98,32 @@ export const APPT_STATUS_LABEL: Record<string, string> = {
 
 export const LAB_STATUS_LABEL: Record<string, string> = {
   requested: "Requested",
-  collected: "Collected",
+  collected: "Sample collected",
+  received: "Sample received",
   processing: "Processing",
-  resulted: "Awaiting verification",
+  entered: "Result entered",
+  awaiting_verification: "Awaiting verification",
   verified: "Verified",
+  rejected: "Specimen rejected — recollect",
+  cancelled: "Cancelled",
+  in_progress: "In progress",
+};
+
+export const SPECIMEN_STATUS_LABEL: Record<string, string> = {
+  collected: "Collected",
+  received: "Received",
   rejected: "Rejected",
 };
+
+/** Categories in the order of the clinic's paper Laboratory Request form. */
+export const LAB_SECTIONS = ["Hematology", "Serology", "Urine Analysis", "Microscopy Examination", "Bacteriology & Parasitology"];
+
+export const RESULT_TYPE_LABEL: Record<string, string> = {
+  numeric: "Number with unit",
+  qualitative: "Choice (e.g. Positive / Negative)",
+  text: "Text finding",
+  microscopy: "Microscopy observation",
+};
+
+/** Usual pre-analytical sample conditions (shown as suggestions; free text allowed). */
+export const SAMPLE_CONDITIONS = ["Acceptable", "Haemolysed", "Clotted", "Insufficient volume", "Lipaemic", "Wrong container", "Unlabelled / mislabelled", "Leaking"];
