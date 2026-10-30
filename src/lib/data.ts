@@ -69,11 +69,24 @@ export function useLiveTable(table: "visits" | "lab_request_items" | "lab_reques
 export const VISIT_STATUS_LABEL: Record<string, string> = {
   waiting: "Waiting",
   in_consultation: "In consultation",
-  awaiting_lab: "Awaiting lab",
+  awaiting_lab: "Pending laboratory",
+  ready_for_review: "Ready for review",
   completed: "Completed",
   cancelled: "Cancelled",
   no_show: "No show",
 };
+
+export function useDiagnosisCatalog() {
+  return useQuery({
+    queryKey: ["diagnosis_catalog"],
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("diagnosis_catalog").select("*").order("display_order").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+}
 
 export const APPT_STATUS_LABEL: Record<string, string> = {
   scheduled: "Scheduled",

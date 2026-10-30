@@ -52,7 +52,7 @@ function Dashboard() {
   const stats = [
     { label: "OPD attendance today", value: v.filter((x) => x.status !== "cancelled").length, icon: Users },
     { label: "Waiting", value: v.filter((x) => x.status === "waiting").length, icon: Clock },
-    { label: "In consultation", value: v.filter((x) => x.status === "in_consultation" || x.status === "awaiting_lab").length, icon: Stethoscope },
+    { label: "In consultation", value: v.filter((x) => ["in_consultation", "awaiting_lab", "ready_for_review"].includes(x.status)).length, icon: Stethoscope },
     ...(seesLab
       ? [
           { label: "Pending lab tests", value: data?.pendingLab ?? 0, icon: FlaskConical },

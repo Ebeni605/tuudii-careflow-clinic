@@ -39,9 +39,9 @@ function Queue() {
       return data;
     },
   });
-  const rows = (queue ?? []).filter((v) => status === "all" || (status === "active" ? ["waiting", "in_consultation", "awaiting_lab"].includes(v.status) : v.status === status));
+  const rows = (queue ?? []).filter((v) => status === "all" || (status === "active" ? ["waiting", "in_consultation", "awaiting_lab", "ready_for_review"].includes(v.status) : v.status === status));
   const svc = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
-  const inQueue = new Set((queue ?? []).filter((v) => ["waiting", "in_consultation", "awaiting_lab"].includes(v.status)).map((v) => v.patient_id));
+  const inQueue = new Set((queue ?? []).filter((v) => ["waiting", "in_consultation", "awaiting_lab", "ready_for_review"].includes(v.status)).map((v) => v.patient_id));
 
   async function update(id: string, patch: { status?: "cancelled" | "no_show"; service_key?: string }) {
     const { error } = await supabase.from("visits").update(patch).eq("id", id);

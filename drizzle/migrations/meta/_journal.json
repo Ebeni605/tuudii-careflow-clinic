@@ -22,6 +22,27 @@
       "when": 1793362606641,
       "tag": "0002_phase2_reception",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793364488515,
+      "tag": "0003_phase3_opd",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793365133903,
+      "tag": "0004_fix_signed_child_guard",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793365157147,
+      "tag": "0005_tighten_opd_grants",
+      "breakpoints": true
     }
   ]
 }

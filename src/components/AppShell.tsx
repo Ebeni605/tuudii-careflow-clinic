@@ -2,7 +2,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import {
   LayoutDashboard, Users, UserPlus, ListOrdered, CalendarDays, Stethoscope,
-  FlaskConical, ShieldCheck, TestTubes, ScrollText, LogOut, ClipboardList, ListChecks,
+  FlaskConical, ShieldCheck, TestTubes, ScrollText, LogOut, ClipboardList, ListChecks, BookOpen,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu,
@@ -28,13 +28,14 @@ const NAV: { label: string; area: Area; items: { title: string; url: string; ico
       { title: "Appointments", url: "/reception/appointments", icon: CalendarDays },
     ],
   },
-  { label: "OPD", area: "opd", items: [{ title: "OPD queue", url: "/opd", icon: Stethoscope }] },
+  { label: "OPD", area: "opd", items: [{ title: "OPD dashboard", url: "/opd", icon: Stethoscope }] },
   { label: "Laboratory", area: "lab", items: [{ title: "Lab worklist", url: "/lab", icon: FlaskConical }] },
   {
     label: "Administration", area: "admin", items: [
       { title: "Staff & roles", url: "/admin/staff", icon: ShieldCheck },
       { title: "Visit services", url: "/admin/services", icon: ListChecks },
       { title: "Test catalogue", url: "/admin/tests", icon: TestTubes },
+      { title: "Diagnosis catalogue", url: "/admin/diagnoses", icon: BookOpen },
       { title: "Audit log", url: "/admin/audit", icon: ScrollText },
     ],
   },
@@ -177,7 +178,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
         <h1 className="text-2xl font-bold text-primary">{title}</h1>
         {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
       </div>
-      {actions && <div className="no-print flex gap-2">{actions}</div>}
+      {actions && <div className="no-print flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
   );
 }

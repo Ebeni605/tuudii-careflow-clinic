@@ -13,6 +13,7 @@ import { PatientForm } from "@/components/PatientForm";
 import { CheckInDialog } from "@/components/CheckInDialog";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PrintHeader } from "@/components/ClinicBrand";
+import { ClinicalHistory } from "@/components/opd/ClinicalHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { APPT_STATUS_LABEL, patientName, useServices, useStaffNames } from "@/lib/data";
 import { requireArea, useStaff } from "@/lib/auth";
@@ -176,6 +177,7 @@ function PatientProfile() {
               </div>
             </CardContent>
           </Card>
+          {canAccess(roles, "opd") && <ClinicalHistory patientId={p.id} />}
           {seesResults && (
             <Card>
               <CardHeader><CardTitle className="text-base">Laboratory requests</CardTitle></CardHeader>
