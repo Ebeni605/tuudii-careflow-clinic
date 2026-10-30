@@ -61,7 +61,7 @@ export function MedicationPanel({ visitId, patientId, consultationId, editable }
           <F label="Dose"><Input value={m.dose} onChange={set("dose")} maxLength={60} placeholder="e.g. 500 mg" /></F>
           <F label="Route">
             <Select value={m.route} onValueChange={(route) => setM({ ...m, route })}>
-              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectTrigger aria-label="Route"><SelectValue placeholder="Select" /></SelectTrigger>
               <SelectContent>{ROUTES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
             </Select>
           </F>
