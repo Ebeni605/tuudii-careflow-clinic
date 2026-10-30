@@ -225,7 +225,7 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   lab_tech: "Laboratory Technician",
 };
 
-export type Area = "dashboard" | "reception" | "opd" | "lab" | "admin" | "patients" | "results";
+export type Area = "dashboard" | "reception" | "opd" | "lab" | "admin" | "patients" | "results" | "billing";
 
 export const AREA_ROLES: Record<Area, AppRole[]> = {
   dashboard: ["admin", "receptionist", "clinician", "lab_tech"],
@@ -235,6 +235,8 @@ export const AREA_ROLES: Record<Area, AppRole[]> = {
   lab: ["admin", "lab_tech"],
   results: ["admin", "clinician", "lab_tech"],
   admin: ["admin"],
+  // Optional billing is an administrative feature used by reception, not a department
+  billing: ["admin", "receptionist"],
 };
 
 export function canAccess(roles: AppRole[], area: Area) {
