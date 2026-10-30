@@ -15,10 +15,13 @@ export type VisitStatus =
 export type LabItemStatus =
   | "requested"
   | "collected"
+  | "received"
   | "processing"
-  | "resulted"
+  | "entered"
+  | "awaiting_verification"
   | "verified"
-  | "rejected";
+  | "rejected" // specimen rejected — waiting for recollection
+  | "cancelled";
 
 export const VISIT_TRANSITIONS: Record<VisitStatus, VisitStatus[]> = {
   waiting: ["in_consultation", "cancelled", "no_show"],
@@ -36,14 +39,22 @@ export const ACTIVE_VISIT_STATUSES: VisitStatus[] = ["waiting", "in_consultation
 /** Visits where the consultation note can be written. */
 export const OPEN_ENCOUNTER_STATUSES: VisitStatus[] = ["in_consultation", "awaiting_lab", "ready_for_review"];
 
+/** Per-test laboratory workflow. Mirrors DB trigger lab_item_before. */
 export const LAB_TRANSITIONS: Record<LabItemStatus, LabItemStatus[]> = {
-  requested: ["collected", "rejected"],
-  collected: ["processing", "rejected"],
-  processing: ["resulted", "rejected"],
-  resulted: ["verified", "processing"],
-  verified: [],
-  rejected: [],
+  requested: ["collected", "cancelled"],
+  collected: ["received", "rejected", "cancelled"],
+  received: ["processing", "rejected", "cancelled"],
+  processing: ["entered", "rejected", "cancelled"],
+  entered: ["awaiting_verification", "cancelled"],
+  awaiting_verification: ["verified", "entered"],
+  rejected: ["collected", "cancelled"], // recollection with a new specimen
+  verified: ["entered"], // only through a documented correction (lab_result_amendments)
+  cancelled: [],
 };
+
+/** A test is finished for OPD once verified or cancelled (rejected specimens wait for recollection). */
+export const LAB_FINAL_STATUSES: LabItemStatus[] = ["verified", "cancelled"];
+export const isLabFinal = (s: string) => (LAB_FINAL_STATUSES as string[]).includes(s);
 
 export function canVisitMove(from: VisitStatus, to: VisitStatus) {
   return VISIT_TRANSITIONS[from].includes(to);
@@ -138,14 +149,18 @@ export function ancEstimates(lmp: string, onDate: string): { edd: string; weeks:
   return { edd, weeks: Math.floor(totalDays / 7), days: totalDays % 7 };
 }
 
-/** A technician may verify only results entered by someone else, unless allowed to self-verify. */
+/**
+ * Verification needs the explicit permission (profiles.can_verify_lab, set by admin) and a
+ * different person from whoever last entered the result, unless allowed to self-verify.
+ */
 export function canVerify(opts: {
-  resultedBy: string | null;
+  enteredBy: string | null | undefined;
   userId: string;
+  canVerifyLab: boolean;
   canSelfVerify: boolean;
 }) {
-  if (!opts.resultedBy) return false;
-  return opts.resultedBy !== opts.userId || opts.canSelfVerify;
+  if (!opts.canVerifyLab || !opts.enteredBy) return false;
+  return opts.enteredBy !== opts.userId || opts.canSelfVerify;
 }
 
 /** Clinicians only see lab results once verified. */
@@ -158,11 +173,49 @@ export function abnormalFlag(
   low: number | null,
   high: number | null,
 ): "L" | "H" | null {
-  const n = Number(value);
-  if (value.trim() === "" || Number.isNaN(n)) return null;
+  const v = value.trim();
+  if (!/^-?\d+(\.\d+)?$/.test(v)) return null; // "<0.5" or text: no automatic flag
+  const n = Number(v);
   if (low != null && n < low) return "L";
   if (high != null && n > high) return "H";
   return null;
+}
+
+export type LabResultType = "numeric" | "qualitative" | "text" | "microscopy";
+export type LabTestConfig = {
+  name: string;
+  result_type: string;
+  ref_low: number | null;
+  ref_high: number | null;
+  result_options: string[] | null;
+  abnormal_options: string[] | null;
+};
+
+/** Problem with an entered value, or null when it can be saved. Mirrors DB trigger lab_result_before. */
+export function labValueProblem(t: LabTestConfig, value: string): string | null {
+  const v = value.trim();
+  if (!v) return "Enter a result";
+  if (t.result_type === "numeric" && !/^[<>]?-?\d+(\.\d+)?$/.test(v)) return `${t.name} needs a number (e.g. 12.5, or <0.5)`;
+  if (t.result_type === "qualitative" && t.result_options?.length && !t.result_options.includes(v)) return `Choose one of: ${t.result_options.join(", ")}`;
+  return null;
+}
+
+/**
+ * Abnormal indicator the database will store: numeric → L/H from the configured range,
+ * qualitative → A when the answer is configured as abnormal, text/microscopy → technician's own A mark.
+ */
+export function labResultFlag(t: LabTestConfig, value: string, manualAbnormal = false): "L" | "H" | "A" | null {
+  if (t.result_type === "numeric") return abnormalFlag(value, t.ref_low, t.ref_high);
+  if (t.result_type === "qualitative") return t.abnormal_options?.includes(value.trim()) ? "A" : null;
+  return manualAbnormal ? "A" : null;
+}
+
+/** Reference shown next to a result; never invented — "Not configured" when the lab has not set one. */
+export function referenceText(r: { ref_low: number | null; ref_high: number | null; ref_text: string | null; unit?: string | null }) {
+  if (r.ref_low != null && r.ref_high != null) return `${r.ref_low} – ${r.ref_high}${r.unit ? ` ${r.unit}` : ""}`;
+  if (r.ref_low != null) return `≥ ${r.ref_low}${r.unit ? ` ${r.unit}` : ""}`;
+  if (r.ref_high != null) return `≤ ${r.ref_high}${r.unit ? ` ${r.unit}` : ""}`;
+  return r.ref_text || "";
 }
 
 export const ROLE_LABELS: Record<AppRole, string> = {
