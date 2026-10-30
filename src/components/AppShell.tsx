@@ -9,6 +9,10 @@ import {
   SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, SidebarHeader, SidebarFooter, useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { UserCircle } from "lucide-react";
 import { ClinicLogo } from "@/components/ClinicBrand";
 import { useSignOut, useStaff } from "@/lib/auth";
 import { canAccess, ROLE_LABELS, type Area } from "@/lib/workflow";
@@ -90,16 +94,34 @@ export function AppShell() {
       <div className="flex min-h-screen w-full">
         <div className="no-print"><AppSidebar /></div>
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="no-print sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-card px-3">
-            <SidebarTrigger />
-            <div className="flex-1" />
+          <header className="no-print sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-card px-3 shadow-sm">
+            <SidebarTrigger aria-label="Toggle menu" />
+            <div className="min-w-0 flex-1 truncate text-sm font-semibold text-primary md:hidden">Two D Medium Clinic</div>
+            <div className="hidden flex-1 md:block" />
             {me && (
-              <div className="text-right text-sm leading-tight">
-                <div className="font-medium">{me.fullName}</div>
-                <div className="text-xs text-muted-foreground">{me.roles.map((r) => ROLE_LABELS[r]).join(", ") || "No role assigned"}</div>
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 rounded-md px-2 py-1 text-left hover:bg-muted" aria-label="Account menu">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                      {initials(me.fullName)}
+                    </span>
+                    <span className="hidden leading-tight sm:block">
+                      <span className="block text-sm font-medium">{me.fullName}</span>
+                      <span className="block text-xs text-muted-foreground">{me.roles.map((r) => ROLE_LABELS[r]).join(", ") || "No role assigned"}</span>
+                    </span>
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="text-sm font-medium">{me.fullName}</div>
+                    <div className="truncate text-xs text-muted-foreground">{me.email}</div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild><Link to="/profile"><UserCircle className="mr-2 h-4 w-4" />My profile</Link></DropdownMenuItem>
+                  <DropdownMenuItem onClick={signOut} className="text-destructive focus:text-destructive"><LogOut className="mr-2 h-4 w-4" />Sign out</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
-            <Button variant="ghost" size="icon" onClick={signOut} aria-label="Sign out"><LogOut className="h-4 w-4" /></Button>
           </header>
           <main className="flex-1 p-4 md:p-6"><Outlet /></main>
         </div>
@@ -108,10 +130,33 @@ export function AppShell() {
   );
 }
 
+function initials(name: string) {
+  return name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "?";
+}
+
+/** Shown when a page's data fails to load. */
+export function LoadError({ message, onRetry }: { message?: string; onRetry?: () => void }) {
+  return (
+    <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm">
+      <div className="font-medium text-destructive">Could not load this information.</div>
+      <div className="mt-1 text-muted-foreground">{message ?? "Check the internet connection and try again."}</div>
+      {onRetry && <Button size="sm" variant="outline" className="mt-3" onClick={onRetry}>Try again</Button>}
+    </div>
+  );
+}
+
+export function PageLoading({ label = "Loading…" }: { label?: string }) {
+  return (
+    <div className="flex items-center gap-3 py-10 text-sm text-muted-foreground" role="status">
+      <span className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />{label}
+    </div>
+  );
+}
+
 /** Renders children only for staff whose role may use this area. */
 export function RequireArea({ area, children }: { area: Area; children: ReactNode }) {
   const { data: me, isLoading } = useStaff();
-  if (isLoading) return <div className="text-muted-foreground">Loading…</div>;
+  if (isLoading) return <PageLoading />;
   if (!me || !canAccess(me.roles, area)) {
     return (
       <div className="mx-auto mt-16 max-w-md rounded-lg border bg-card p-6 text-center">
