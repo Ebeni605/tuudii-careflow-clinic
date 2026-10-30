@@ -50,7 +50,7 @@ export function useStaffNames() {
 }
 
 /** Invalidate the given query keys whenever rows change in a table. */
-export function useLiveTable(table: "visits" | "lab_request_items" | "lab_requests", keys: string[][]) {
+export function useLiveTable(table: "visits" | "lab_request_items" | "lab_requests" | "appointments", keys: string[][]) {
   const qc = useQueryClient();
   const sig = JSON.stringify(keys);
   useEffect(() => {

@@ -49,7 +49,7 @@ function Appointments() {
   const { data: services } = useServices();
   const qc = useQueryClient();
   useLiveTable("visits", [["appts"]]);
-  useLiveTable("appointments" as never, [["appts"]]);
+  useLiveTable("appointments", [["appts"]]);
 
   const { data: appts, isLoading, error, refetch } = useQuery({
     queryKey: ["appts", day],

@@ -43,7 +43,7 @@ function NewPatient() {
     setBusy(true);
     const row = toPatientRow(v);
     const { data, error } = await supabase.rpc("find_possible_duplicates", {
-      _first: row.first_name, _father: row.middle_name, _phone: row.phone ?? "", _dob: row.date_of_birth as string,
+      _first: row.first_name, _father: row.middle_name, _phone: row.phone ?? "", _dob: row.date_of_birth as never,
     });
     setBusy(false);
     if (error) { toast.error("Could not check for existing patients: " + error.message); return; }

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LoadError, PageHeader } from "@/components/AppShell";
 import { ClipboardList, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { today, useLiveTable, useServices } from "@/lib/data";
+import { clinicDayRange, today, useLiveTable, useServices } from "@/lib/data";
 import { requireArea, useStaff } from "@/lib/auth";
 import { canAccess } from "@/lib/workflow";
 
@@ -30,9 +30,9 @@ function Dashboard() {
       const d = today();
       const [{ data: visits, error: ve }, { count: newPatients }, labs] = await Promise.all([
         supabase.from("visits").select("status, service_key").eq("queue_date", d),
-        supabase.from("patients").select("id", { count: "exact", head: true }).gte("created_at", `${d}T00:00:00`),
+        supabase.from("patients").select("id", { count: "exact", head: true }).gte("created_at", clinicDayRange(d).from),
         seesLab
-          ? supabase.from("lab_request_items").select("status, lab_requests!inner(created_at)").gte("lab_requests.created_at", `${d}T00:00:00`)
+          ? supabase.from("lab_request_items").select("status, lab_requests!inner(created_at)").gte("lab_requests.created_at", clinicDayRange(d).from)
           : Promise.resolve({ data: [] as { status: string }[] }),
       ]);
       if (ve) throw ve;
@@ -63,7 +63,7 @@ function Dashboard() {
   const max = Math.max(1, ...(services ?? []).map((s) => v.filter((x) => x.service_key === s.key).length));
 
   const departments = [
-    { area: "reception" as const, title: "Reception", icon: ClipboardList, text: "Registration, patient ID, search, appointments, walk-ins and the queue.", to: "/reception/queue" as const },
+    { area: "reception" as const, title: "Reception", icon: ClipboardList, text: "Registration, patient ID, search, appointments, walk-ins and the queue.", to: "/reception" as const },
     { area: "opd" as const, title: "OPD", icon: Stethoscope, text: "Consultation, vital signs, history, diagnosis, treatment notes and lab requests.", to: "/opd" as const },
     { area: "lab" as const, title: "Laboratory", icon: FlaskConical, text: "Worklist, specimens, processing, results, verification and reports.", to: "/lab" as const },
   ];

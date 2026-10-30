@@ -2,7 +2,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import {
   LayoutDashboard, Users, UserPlus, ListOrdered, CalendarDays, Stethoscope,
-  FlaskConical, ShieldCheck, TestTubes, ScrollText, LogOut,
+  FlaskConical, ShieldCheck, TestTubes, ScrollText, LogOut, ClipboardList, ListChecks,
 } from "lucide-react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu,
@@ -21,6 +21,7 @@ const NAV: { label: string; area: Area; items: { title: string; url: string; ico
   { label: "Overview", area: "dashboard", items: [{ title: "Dashboard", url: "/dashboard", icon: LayoutDashboard }] },
   {
     label: "Reception", area: "reception", items: [
+      { title: "Reception dashboard", url: "/reception", icon: ClipboardList },
       { title: "Patients", url: "/patients", icon: Users },
       { title: "Register patient", url: "/patients/new", icon: UserPlus },
       { title: "Check-in & queue", url: "/reception/queue", icon: ListOrdered },
@@ -32,6 +33,7 @@ const NAV: { label: string; area: Area; items: { title: string; url: string; ico
   {
     label: "Administration", area: "admin", items: [
       { title: "Staff & roles", url: "/admin/staff", icon: ShieldCheck },
+      { title: "Visit services", url: "/admin/services", icon: ListChecks },
       { title: "Test catalogue", url: "/admin/tests", icon: TestTubes },
       { title: "Audit log", url: "/admin/audit", icon: ScrollText },
     ],
@@ -68,7 +70,7 @@ function AppSidebar() {
               <SidebarMenu>
                 {g.items.map((item) => (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild isActive={path === item.url} tooltip={item.title}>
+                    <SidebarMenuButton asChild isActive={path === item.url || path === item.url + "/"} tooltip={item.title}>
                       <Link to={item.url} onClick={() => isMobile && setOpenMobile(false)}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
