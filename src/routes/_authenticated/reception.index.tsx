@@ -27,7 +27,7 @@ function ReceptionDashboard() {
     queryFn: async () => {
       const [total, regToday, visits, appts, recent] = await Promise.all([
         supabase.from("patients").select("id", { count: "exact", head: true }).eq("archived", false),
-        supabase.from("patients").select("id", { count: "exact", head: true }).gte("created_at", range.from).lte("created_at", range.to),
+        supabase.from("patients").select("id", { count: "exact", head: true }).eq("archived", false).gte("created_at", range.from).lte("created_at", range.to),
         supabase.from("visits").select("status, visit_type").eq("queue_date", d),
         supabase.from("appointments").select("*, patients(id, mrn, first_name, middle_name, last_name)").gte("scheduled_at", range.from).lte("scheduled_at", range.to).order("scheduled_at"),
         supabase.from("patients").select("id, mrn, first_name, middle_name, last_name, sex, created_at").order("created_at", { ascending: false }).limit(6),
