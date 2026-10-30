@@ -29,7 +29,7 @@ type Form = {
   unit: string; ref_low: string; ref_high: string; ref_text: string; result_options: string; abnormal_options: string;
   reference_source: string; catalogue_note: string; display_order: string; active: boolean;
 };
-const EMPTY: Form = { code: "", name: "", section: LAB_SECTIONS[0], panel: "", specimen_type: "", result_type: "numeric", unit: "", ref_low: "", ref_high: "", ref_text: "", result_options: "", abnormal_options: "", reference_source: "", catalogue_note: "", display_order: "0", active: true };
+const EMPTY: Form = { code: "", name: "", section: "Hematology", panel: "", specimen_type: "", result_type: "numeric", unit: "", ref_low: "", ref_high: "", ref_text: "", result_options: "", abnormal_options: "", reference_source: "", catalogue_note: "", display_order: "0", active: true };
 const list = (s: string) => { const a = s.split(",").map((x) => x.trim()).filter(Boolean); return a.length ? a : null; };
 const num = (s: string) => (s.trim() === "" ? null : Number(s));
 const str = (s: string) => s.trim() || null;

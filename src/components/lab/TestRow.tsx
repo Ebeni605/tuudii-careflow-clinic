@@ -57,8 +57,8 @@ export function TestRow({ item, me, names, amendments, accession, onChange }: {
     if (problem) { toast.error(problem); return; }
     setBusy(true);
     const { error } = await supabase.rpc("save_lab_result", {
-      _item_id: item.id, _value: value.trim(), _comment: comment.trim() || undefined,
-      _flag: (t.result_type === "text" || t.result_type === "microscopy") && abn ? "A" : undefined,
+      _item_id: item.id, _value: value.trim(), _comment: comment.trim(),
+      _flag: (t.result_type === "text" || t.result_type === "microscopy") && abn ? "A" : "",
     });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
@@ -167,7 +167,7 @@ export function TestRow({ item, me, names, amendments, accession, onChange }: {
         onConfirm={async (reason) => {
           const { error } = await supabase.rpc("amend_lab_result", { _item_id: item.id, _reason: reason });
           if (error) { toast.error(error.message); return false; }
-          toast.success("Correction started — enter the corrected result"); onChange();
+          toast.success("Correction started — enter the corrected result"); onChange(); return true;
         }} />
     </div>
   );

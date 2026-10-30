@@ -79,7 +79,7 @@ export function SpecimenPanel({ req, isTech, myId, names, onChange }: {
     const { data, error } = await supabase.rpc("collect_specimen", {
       _request_id: req.id, _item_ids: [...sel], _specimen_type: type.trim(),
       _collected_at: new Date(`${at}:00+03:00`).toISOString(), _collected_by: by,
-      _received: receivedNow, _condition: receivedNow ? condition : undefined, _notes: notes.trim() || undefined,
+      _received: receivedNow, _condition: receivedNow ? condition : "", _notes: notes.trim(),
     });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
@@ -156,7 +156,7 @@ export function SpecimenPanel({ req, isTech, myId, names, onChange }: {
             {typeGroups.length > 1 && typeGroups.map(([t, ids]) => (
               <Button key={t} size="sm" variant="outline" onClick={() => openCollect(ids, t)}>Collect {t} ({ids.length})</Button>
             ))}
-            <Button size="sm" onClick={() => openCollect(undefined, typeGroups.length === 1 ? typeGroups[0][0] : undefined)}>Register specimen</Button>
+            <Button size="sm" onClick={() => openCollect(undefined, typeGroups.length === 1 ? typeGroups[0]?.[0] : undefined)}>Register specimen</Button>
           </div>
         )}
       </CardHeader>
@@ -218,10 +218,11 @@ export function SpecimenPanel({ req, isTech, myId, names, onChange }: {
         confirmLabel="Reject specimen"
         destructive
         onConfirm={async (reason) => {
-          const { error } = await supabase.rpc("reject_specimen", { _specimen_id: rejecting!.id, _reason: reason, _condition: rejectCondition || undefined });
+          const { error } = await supabase.rpc("reject_specimen", { _specimen_id: rejecting!.id, _reason: reason, _condition: rejectCondition });
           if (error) { toast.error(error.message); return false; }
           toast.success("Specimen rejected — collect a new one");
           onChange();
+          return true;
         }}
       >
         <div className="space-y-1.5"><Label htmlFor="rj-cond">Sample condition</Label><ConditionSelect id="rj-cond" value={rejectCondition} onChange={setRejectCondition} /></div>

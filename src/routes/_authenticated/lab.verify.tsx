@@ -97,7 +97,7 @@ function Verify() {
         onConfirm={async (reason) => {
           const { error } = await supabase.from("lab_request_items").update({ status: "entered", returned_reason: reason } as never).eq("id", returning!);
           if (error) { toast.error(error.message); return false; }
-          toast.success("Returned to the technician for correction"); refetch();
+          toast.success("Returned to the technician for correction"); refetch(); return true;
         }} />
     </div>
   );
