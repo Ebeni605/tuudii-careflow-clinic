@@ -10,7 +10,7 @@ import { PageHeader, RequireArea } from "@/components/AppShell";
 import { requireArea } from "@/lib/auth";
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
-import { patientName, today, useLiveTable, useStaffNames } from "@/lib/data";
+import { clinicDayRange, patientName, today, useLiveTable, useStaffNames } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/lab/")({
   beforeLoad: requireArea("lab"),
@@ -30,7 +30,7 @@ function Worklist() {
     queryFn: async () => {
       let q = supabase.from("lab_requests").select("*, patients(mrn, first_name, middle_name, last_name, sex), lab_request_items(status)").order("created_at", { ascending: false }).limit(200);
       if (tab === "open") q = q.in("status", ["requested", "in_progress"]);
-      else q = q.gte("created_at", new Date(`${day}T00:00:00`).toISOString()).lte("created_at", new Date(`${day}T23:59:59`).toISOString());
+      else q = q.gte("created_at", clinicDayRange(day).from).lte("created_at", clinicDayRange(day).to);
       return (await q).data ?? [];
     },
   });

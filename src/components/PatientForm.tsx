@@ -1,79 +1,139 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  AGE_UNITS, EMPTY_PATIENT, ETHIOPIA_REGIONS, ageInYears, clinicToday, patientSchema, type PatientFormValues,
+} from "@/lib/patient-schema";
 
-export type PatientInput = {
-  first_name: string; middle_name: string; last_name: string; sex: string; date_of_birth: string;
-  phone: string; address: string; kebele: string; woreda: string;
-  emergency_contact_name: string; emergency_contact_phone: string; allergies: string;
-};
+type Errors = Partial<Record<keyof PatientFormValues, string | undefined>>;
 
-const EMPTY: PatientInput = {
-  first_name: "", middle_name: "", last_name: "", sex: "", date_of_birth: "", phone: "", address: "",
-  kebele: "", woreda: "", emergency_contact_name: "", emergency_contact_phone: "", allergies: "",
-};
-
-export function toPatientRow(v: PatientInput) {
-  const n = (s: string) => (s.trim() === "" ? null : s.trim());
-  return {
-    first_name: v.first_name.trim(), middle_name: n(v.middle_name), last_name: v.last_name.trim(),
-    sex: v.sex, date_of_birth: n(v.date_of_birth), phone: n(v.phone), address: n(v.address),
-    kebele: n(v.kebele), woreda: n(v.woreda), emergency_contact_name: n(v.emergency_contact_name),
-    emergency_contact_phone: n(v.emergency_contact_phone), allergies: n(v.allergies),
-  };
-}
-
-export function PatientForm({ initial, onSubmit, busy, submitLabel }: {
-  initial?: Partial<PatientInput>; onSubmit: (v: PatientInput) => void; busy?: boolean; submitLabel: string;
+export function PatientForm({ initial, onSubmit, busy, submitLabel, extra }: {
+  initial?: Partial<PatientFormValues>;
+  onSubmit: (v: PatientFormValues) => void;
+  busy?: boolean;
+  submitLabel: string;
+  /** Extra fields rendered above the submit button (e.g. correction reason). */
+  extra?: ReactNode;
 }) {
-  const [v, setV] = useState<PatientInput>({ ...EMPTY, ...initial });
-  const [ageYears, setAgeYears] = useState("");
-  const set = (k: keyof PatientInput) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setV({ ...v, [k]: e.target.value });
+  const [v, setV] = useState<PatientFormValues>({ ...EMPTY_PATIENT, ...initial });
+  const [errors, setErrors] = useState<Errors>({});
+  const set = (k: keyof PatientFormValues) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setV({ ...v, [k]: e.target.value });
+    if (errors[k]) setErrors({ ...errors, [k]: undefined });
+  };
+  const years = ageInYears(v);
+  const isChild = years !== null && years < 18;
 
-  function applyAge(a: string) {
-    setAgeYears(a);
-    const n = Number(a);
-    if (a && !Number.isNaN(n)) {
-      const y = new Date().getFullYear() - Math.floor(n);
-      setV((p) => ({ ...p, date_of_birth: `${y}-01-01` }));
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    const r = patientSchema.safeParse(v);
+    if (!r.success) {
+      const fe = r.error.flatten().fieldErrors as Record<string, string[]>;
+      setErrors(Object.fromEntries(Object.entries(fe).map(([k, m]) => [k, m[0]])) as Errors);
+      return;
     }
+    setErrors({});
+    onSubmit(v);
   }
 
+  const errCount = Object.values(errors).filter(Boolean).length;
+
   return (
-    <form
-      className="grid gap-4 md:grid-cols-3"
-      onSubmit={(e) => { e.preventDefault(); if (!v.sex) return; onSubmit(v); }}
-    >
-      <F label="First name *"><Input value={v.first_name} onChange={set("first_name")} required maxLength={60} /></F>
-      <F label="Father's name"><Input value={v.middle_name} onChange={set("middle_name")} maxLength={60} /></F>
-      <F label="Grandfather's name *"><Input value={v.last_name} onChange={set("last_name")} required maxLength={60} /></F>
-      <F label="Sex *">
-        <Select value={v.sex} onValueChange={(s) => setV({ ...v, sex: s })}>
-          <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
-          <SelectContent><SelectItem value="female">Female</SelectItem><SelectItem value="male">Male</SelectItem></SelectContent>
-        </Select>
-      </F>
-      <F label="Date of birth"><Input type="date" value={v.date_of_birth} max={new Date().toISOString().slice(0, 10)} onChange={set("date_of_birth")} /></F>
-      <F label="…or age in years (estimate)"><Input type="number" min={0} max={120} value={ageYears} onChange={(e) => applyAge(e.target.value)} /></F>
-      <F label="Phone"><Input value={v.phone} onChange={set("phone")} inputMode="tel" maxLength={20} /></F>
-      <F label="Kebele"><Input value={v.kebele} onChange={set("kebele")} maxLength={40} /></F>
-      <F label="Woreda / Town"><Input value={v.woreda} onChange={set("woreda")} maxLength={60} /></F>
-      <div className="md:col-span-3"><F label="Address details"><Input value={v.address} onChange={set("address")} maxLength={200} /></F></div>
-      <F label="Emergency contact name"><Input value={v.emergency_contact_name} onChange={set("emergency_contact_name")} maxLength={80} /></F>
-      <F label="Emergency contact phone"><Input value={v.emergency_contact_phone} onChange={set("emergency_contact_phone")} maxLength={20} /></F>
-      <div />
-      <div className="md:col-span-3"><F label="Known allergies"><Textarea value={v.allergies} onChange={set("allergies")} rows={2} maxLength={500} placeholder="Leave empty if none known" /></F></div>
-      <div className="md:col-span-3">
-        {!v.sex && <p className="mb-2 text-xs text-muted-foreground">Select sex to continue.</p>}
-        <Button type="submit" disabled={busy || !v.sex}>{busy ? "Saving…" : submitLabel}</Button>
-      </div>
+    <form className="space-y-6" onSubmit={submit} noValidate>
+      <Section title="Name">
+        <F label="First / given name *" error={errors.first_name}><Input value={v.first_name} onChange={set("first_name")} maxLength={60} autoFocus /></F>
+        <F label="Father's name *" error={errors.middle_name}><Input value={v.middle_name} onChange={set("middle_name")} maxLength={60} /></F>
+        <F label="Grandfather's name (optional)" error={errors.last_name}><Input value={v.last_name} onChange={set("last_name")} maxLength={60} /></F>
+      </Section>
+
+      <Section title="Sex and age">
+        <F label="Sex *" error={errors.sex}>
+          <Select value={v.sex} onValueChange={(s) => { setV({ ...v, sex: s as "male" }); setErrors({ ...errors, sex: undefined }); }}>
+            <SelectTrigger aria-label="Sex"><SelectValue placeholder="Select" /></SelectTrigger>
+            <SelectContent><SelectItem value="female">Female</SelectItem><SelectItem value="male">Male</SelectItem></SelectContent>
+          </Select>
+        </F>
+        <div className="space-y-1.5 md:col-span-2">
+          <Label>Age *</Label>
+          <RadioGroup className="flex flex-wrap gap-4" value={v.dob_mode} onValueChange={(m) => setV({ ...v, dob_mode: m as "dob" })}>
+            <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="dob" />Date of birth known</label>
+            <label className="flex items-center gap-2 text-sm"><RadioGroupItem value="estimated" />Estimate age</label>
+          </RadioGroup>
+          {v.dob_mode === "dob" ? (
+            <div><Input aria-label="Date of birth" type="date" max={clinicToday()} value={v.date_of_birth} onChange={set("date_of_birth")} className="max-w-xs" />
+              {errors.date_of_birth && <Err>{errors.date_of_birth}</Err>}</div>
+          ) : (
+            <div>
+              <div className="flex max-w-xs gap-2">
+                <Input aria-label="Estimated age" type="number" min={0} max={130} value={v.estimated_age} onChange={set("estimated_age")} />
+                <Select value={v.estimated_age_unit} onValueChange={(u) => setV({ ...v, estimated_age_unit: u as "years" })}>
+                  <SelectTrigger aria-label="Age unit" className="w-32"><SelectValue /></SelectTrigger>
+                  <SelectContent>{AGE_UNITS.map((u) => <SelectItem key={u} value={u}>{u}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              {errors.estimated_age && <Err>{errors.estimated_age}</Err>}
+            </div>
+          )}
+        </div>
+      </Section>
+
+      <Section title="Contact and address">
+        <F label="Phone (optional)" error={errors.phone}><Input value={v.phone} onChange={set("phone")} inputMode="tel" maxLength={20} placeholder="09…" /></F>
+        <F label="Region" error={errors.region}>
+          <Select value={v.region} onValueChange={(r) => setV({ ...v, region: r })}>
+            <SelectTrigger aria-label="Region"><SelectValue placeholder="Select region" /></SelectTrigger>
+            <SelectContent>{ETHIOPIA_REGIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent>
+          </Select>
+        </F>
+        <F label="Town" error={errors.town}><Input value={v.town} onChange={set("town")} maxLength={80} /></F>
+        <F label="Kebele" error={errors.kebele}><Input value={v.kebele} onChange={set("kebele")} maxLength={40} /></F>
+        <div className="md:col-span-2"><F label="Address details" error={errors.address}><Input value={v.address} onChange={set("address")} maxLength={200} /></F></div>
+      </Section>
+
+      {(isChild || v.guardian_name) && (
+        <Section title={`Guardian${years !== null && years < 15 ? " (required for children under 15)" : ""}`}>
+          <F label="Guardian name" error={errors.guardian_name}><Input value={v.guardian_name} onChange={set("guardian_name")} maxLength={100} /></F>
+          <F label="Relationship" error={errors.guardian_relationship}><Input value={v.guardian_relationship} onChange={set("guardian_relationship")} maxLength={40} placeholder="Mother, father…" /></F>
+          <F label="Guardian phone" error={errors.guardian_phone}><Input value={v.guardian_phone} onChange={set("guardian_phone")} inputMode="tel" maxLength={20} /></F>
+        </Section>
+      )}
+
+      <Section title="Emergency contact and alerts">
+        <F label="Emergency contact name" error={errors.emergency_contact_name}><Input value={v.emergency_contact_name} onChange={set("emergency_contact_name")} maxLength={100} /></F>
+        <F label="Emergency contact phone" error={errors.emergency_contact_phone}><Input value={v.emergency_contact_phone} onChange={set("emergency_contact_phone")} inputMode="tel" maxLength={20} /></F>
+        <div className="md:col-span-3"><F label="Known allergies" error={errors.allergies}><Textarea value={v.allergies} onChange={set("allergies")} rows={2} maxLength={500} placeholder="Leave empty if none known" /></F></div>
+      </Section>
+
+      {extra}
+      {errCount > 0 && <p className="text-sm text-destructive" role="alert">Please correct the {errCount} highlighted field{errCount > 1 ? "s" : ""}.</p>}
+      <Button type="submit" disabled={busy}>{busy ? "Saving…" : submitLabel}</Button>
     </form>
   );
 }
 
-function F({ label, children }: { label: string; children: React.ReactNode }) {
-  return <div className="space-y-1.5"><Label>{label}</Label>{children}</div>;
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <fieldset className="rounded-md border p-4">
+      <legend className="px-1 text-sm font-semibold text-primary">{title}</legend>
+      <div className="grid gap-4 md:grid-cols-3">{children}</div>
+    </fieldset>
+  );
+}
+
+function Err({ children }: { children: ReactNode }) {
+  return <p className="mt-1 text-xs text-destructive">{children}</p>;
+}
+
+function F({ label, error, children }: { label: string; error?: string | undefined; children: ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <Label className={error ? "text-destructive" : ""}>{label}</Label>
+      <div className={error ? "[&_input]:border-destructive [&_button]:border-destructive" : ""}>{children}</div>
+      {error && <Err>{error}</Err>}
+    </div>
+  );
 }

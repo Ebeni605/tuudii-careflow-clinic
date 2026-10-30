@@ -20,4 +20,9 @@
 - Clinical CRUD uses the browser client under RLS; every clinical table has an audit trigger writing `audit_log`.
 - Service-specific consultation fields live in `src/lib/templates.ts`, stored in `consultations.template_data` (jsonb).
 - Lab catalogue sections/order follow the clinic's paper request form; printouts use `PrintHeader` plus `.no-print`/`print-area` CSS.
+- Patient number (`mrn`), registration date/staff, queue number/date and check-in staff/time are set and kept immutable by DB triggers; patients are never deleted — admin archives with a reason (`archived*` columns), archived patients cannot be booked or checked in.
+- Demographic corrections must carry a new `correction_note` (trigger-enforced) so the audit log records why; `middle_name` = father's name (required), `last_name` = grandfather's name ('' when unknown).
+- Clinic "today" is Africa/Addis_Ababa (`clinic_today()` in SQL, `clinicToday()`/`clinicDayRange()` in TS) — never use the browser's or UTC date for queue/appointment days.
+- Double booking and duplicate queue entries are blocked by partial unique indexes (`appointments_one_per_day`, `visits_one_active_per_patient_day`, `visits_one_per_appointment`); `friendlyDbError` maps them to plain messages.
+- Patient form rules live in `src/lib/patient-schema.ts` (zod, unit-tested) and mirror the `assign_mrn` trigger validations — change both together.
 - Development data must be fictional only.

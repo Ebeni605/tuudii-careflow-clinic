@@ -1,7 +1,9 @@
 import { cn } from "@/lib/utils";
-import { LAB_STATUS_LABEL, VISIT_STATUS_LABEL } from "@/lib/data";
+import { APPT_STATUS_LABEL, LAB_STATUS_LABEL, VISIT_STATUS_LABEL } from "@/lib/data";
 
 const TONE: Record<string, string> = {
+  scheduled: "bg-secondary text-secondary-foreground border-primary/20",
+  checked_in: "bg-primary/10 text-primary border-primary/30",
   waiting: "bg-warning/20 text-warning-foreground border-warning/40",
   requested: "bg-warning/20 text-warning-foreground border-warning/40",
   in_consultation: "bg-primary/10 text-primary border-primary/30",
@@ -18,10 +20,10 @@ const TONE: Record<string, string> = {
   urgent: "bg-destructive text-destructive-foreground border-destructive",
 };
 
-export function StatusBadge({ status, label }: { status: string; label?: string }) {
+export function StatusBadge({ status, label }: { status: string; label?: string | undefined }) {
   return (
     <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium whitespace-nowrap", TONE[status] ?? "bg-muted")}>
-      {label ?? VISIT_STATUS_LABEL[status] ?? LAB_STATUS_LABEL[status] ?? status.replace("_", " ")}
+      {label ?? VISIT_STATUS_LABEL[status] ?? LAB_STATUS_LABEL[status] ?? APPT_STATUS_LABEL[status] ?? status.replace("_", " ")}
     </span>
   );
 }

@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       appointments: {
         Row: {
+          cancel_reason: string | null
           clinician_id: string | null
           created_at: string
           created_by: string | null
@@ -25,8 +26,11 @@ export type Database = {
           scheduled_at: string
           service_key: string
           status: string
+          updated_at: string
+          updated_by: string | null
         }
         Insert: {
+          cancel_reason?: string | null
           clinician_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -36,8 +40,11 @@ export type Database = {
           scheduled_at: string
           service_key: string
           status?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Update: {
+          cancel_reason?: string | null
           clinician_id?: string | null
           created_at?: string
           created_by?: string | null
@@ -47,6 +54,8 @@ export type Database = {
           scheduled_at?: string
           service_key?: string
           status?: string
+          updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
@@ -404,57 +413,96 @@ export type Database = {
         Row: {
           address: string | null
           allergies: string | null
+          archived: boolean
+          archived_at: string | null
+          archived_by: string | null
+          archived_reason: string | null
+          correction_note: string | null
           created_at: string
           created_by: string | null
           date_of_birth: string | null
+          dob_estimated: boolean
           emergency_contact_name: string | null
           emergency_contact_phone: string | null
+          estimated_age: number | null
+          estimated_age_unit: string | null
           first_name: string
+          guardian_name: string | null
+          guardian_phone: string | null
+          guardian_relationship: string | null
           id: string
           kebele: string | null
           last_name: string
           middle_name: string | null
-          mrn: string | null
+          mrn: string
           phone: string | null
+          region: string | null
           sex: string
+          town: string | null
           updated_at: string
           woreda: string | null
         }
         Insert: {
           address?: string | null
           allergies?: string | null
+          archived?: boolean
+          archived_at?: string | null
+          archived_by?: string | null
+          archived_reason?: string | null
+          correction_note?: string | null
           created_at?: string
           created_by?: string | null
           date_of_birth?: string | null
+          dob_estimated?: boolean
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          estimated_age?: number | null
+          estimated_age_unit?: string | null
           first_name: string
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          guardian_relationship?: string | null
           id?: string
           kebele?: string | null
-          last_name: string
+          last_name?: string
           middle_name?: string | null
-          mrn?: string | null
+          mrn: string
           phone?: string | null
+          region?: string | null
           sex: string
+          town?: string | null
           updated_at?: string
           woreda?: string | null
         }
         Update: {
           address?: string | null
           allergies?: string | null
+          archived?: boolean
+          archived_at?: string | null
+          archived_by?: string | null
+          archived_reason?: string | null
+          correction_note?: string | null
           created_at?: string
           created_by?: string | null
           date_of_birth?: string | null
+          dob_estimated?: boolean
           emergency_contact_name?: string | null
           emergency_contact_phone?: string | null
+          estimated_age?: number | null
+          estimated_age_unit?: string | null
           first_name?: string
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          guardian_relationship?: string | null
           id?: string
           kebele?: string | null
           last_name?: string
           middle_name?: string | null
-          mrn?: string | null
+          mrn?: string
           phone?: string | null
+          region?: string | null
           sex?: string
+          town?: string | null
           updated_at?: string
           woreda?: string | null
         }
@@ -678,6 +726,22 @@ export type Database = {
     }
     Functions: {
       admin_exists: { Args: never; Returns: boolean }
+      clinic_today: { Args: never; Returns: string }
+      find_possible_duplicates: {
+        Args: { _dob: string; _father: string; _first: string; _phone: string }
+        Returns: {
+          date_of_birth: string
+          first_name: string
+          id: string
+          last_name: string
+          middle_name: string
+          mrn: string
+          phone: string
+          reason: string
+          sex: string
+          town: string
+        }[]
+      }
       has_any_role: {
         Args: {
           _roles: Database["public"]["Enums"]["app_role"][]

@@ -16,6 +16,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedNoAccessRouteImport } from './routes/_authenticated/no-access'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin.audit'
+import { Route as AuthenticatedAdminServicesRouteImport } from './routes/_authenticated/admin.services'
 import { Route as AuthenticatedAdminStaffRouteImport } from './routes/_authenticated/admin.staff'
 import { Route as AuthenticatedAdminTestsRouteImport } from './routes/_authenticated/admin.tests'
 import { Route as AuthenticatedLabIndexRouteImport } from './routes/_authenticated/lab.index'
@@ -23,6 +24,7 @@ import { Route as AuthenticatedOpdIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients.index'
 import { Route as AuthenticatedPatientsPatientIdRouteImport } from './routes/_authenticated/patients.$patientId'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients.new'
+import { Route as AuthenticatedReceptionIndexRouteImport } from './routes/_authenticated/reception.index'
 import { Route as AuthenticatedReceptionAppointmentsRouteImport } from './routes/_authenticated/reception.appointments'
 import { Route as AuthenticatedReceptionQueueRouteImport } from './routes/_authenticated/reception.queue'
 import { Route as AuthenticatedLabReportRequestIdRouteImport } from './routes/_authenticated/lab.report.$requestId'
@@ -63,6 +65,12 @@ const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   path: '/admin/audit',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminServicesRoute =
+  AuthenticatedAdminServicesRouteImport.update({
+    id: '/admin/services',
+    path: '/admin/services',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminStaffRoute = AuthenticatedAdminStaffRouteImport.update({
   id: '/admin/staff',
   path: '/admin/staff',
@@ -99,6 +107,12 @@ const AuthenticatedPatientsNewRoute =
   AuthenticatedPatientsNewRouteImport.update({
     id: '/patients/new',
     path: '/patients/new',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReceptionIndexRoute =
+  AuthenticatedReceptionIndexRouteImport.update({
+    id: '/reception/',
+    path: '/reception/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedReceptionAppointmentsRoute =
@@ -139,6 +153,7 @@ export interface FileRoutesByFullPath {
   '/no-access': typeof AuthenticatedNoAccessRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
@@ -148,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/lab/': typeof AuthenticatedLabIndexRoute
   '/opd/': typeof AuthenticatedOpdIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/reception/': typeof AuthenticatedReceptionIndexRoute
   '/lab/report/$requestId': typeof AuthenticatedLabReportRequestIdRoute
   '/lab/request/$requestId': typeof AuthenticatedLabRequestRequestIdRoute
   '/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
@@ -159,6 +175,7 @@ export interface FileRoutesByTo {
   '/no-access': typeof AuthenticatedNoAccessRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/services': typeof AuthenticatedAdminServicesRoute
   '/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
@@ -168,6 +185,7 @@ export interface FileRoutesByTo {
   '/lab': typeof AuthenticatedLabIndexRoute
   '/opd': typeof AuthenticatedOpdIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
+  '/reception': typeof AuthenticatedReceptionIndexRoute
   '/lab/report/$requestId': typeof AuthenticatedLabReportRequestIdRoute
   '/lab/request/$requestId': typeof AuthenticatedLabRequestRequestIdRoute
   '/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
@@ -181,6 +199,7 @@ export interface FileRoutesById {
   '/_authenticated/no-access': typeof AuthenticatedNoAccessRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/services': typeof AuthenticatedAdminServicesRoute
   '/_authenticated/admin/staff': typeof AuthenticatedAdminStaffRoute
   '/_authenticated/admin/tests': typeof AuthenticatedAdminTestsRoute
   '/_authenticated/patients/$patientId': typeof AuthenticatedPatientsPatientIdRoute
@@ -190,6 +209,7 @@ export interface FileRoutesById {
   '/_authenticated/lab/': typeof AuthenticatedLabIndexRoute
   '/_authenticated/opd/': typeof AuthenticatedOpdIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/_authenticated/reception/': typeof AuthenticatedReceptionIndexRoute
   '/_authenticated/lab/report/$requestId': typeof AuthenticatedLabReportRequestIdRoute
   '/_authenticated/lab/request/$requestId': typeof AuthenticatedLabRequestRequestIdRoute
   '/_authenticated/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
@@ -203,6 +223,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/profile'
     | '/admin/audit'
+    | '/admin/services'
     | '/admin/staff'
     | '/admin/tests'
     | '/patients/$patientId'
@@ -212,6 +233,7 @@ export interface FileRouteTypes {
     | '/lab/'
     | '/opd/'
     | '/patients/'
+    | '/reception/'
     | '/lab/report/$requestId'
     | '/lab/request/$requestId'
     | '/opd/visit/$visitId'
@@ -223,6 +245,7 @@ export interface FileRouteTypes {
     | '/no-access'
     | '/profile'
     | '/admin/audit'
+    | '/admin/services'
     | '/admin/staff'
     | '/admin/tests'
     | '/patients/$patientId'
@@ -232,6 +255,7 @@ export interface FileRouteTypes {
     | '/lab'
     | '/opd'
     | '/patients'
+    | '/reception'
     | '/lab/report/$requestId'
     | '/lab/request/$requestId'
     | '/opd/visit/$visitId'
@@ -244,6 +268,7 @@ export interface FileRouteTypes {
     | '/_authenticated/no-access'
     | '/_authenticated/profile'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/services'
     | '/_authenticated/admin/staff'
     | '/_authenticated/admin/tests'
     | '/_authenticated/patients/$patientId'
@@ -253,6 +278,7 @@ export interface FileRouteTypes {
     | '/_authenticated/lab/'
     | '/_authenticated/opd/'
     | '/_authenticated/patients/'
+    | '/_authenticated/reception/'
     | '/_authenticated/lab/report/$requestId'
     | '/_authenticated/lab/request/$requestId'
     | '/_authenticated/opd/visit/$visitId'
@@ -315,6 +341,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminAuditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/services': {
+      id: '/_authenticated/admin/services'
+      path: '/admin/services'
+      fullPath: '/admin/services'
+      preLoaderRoute: typeof AuthenticatedAdminServicesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/staff': {
       id: '/_authenticated/admin/staff'
       path: '/admin/staff'
@@ -364,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPatientsNewRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reception/': {
+      id: '/_authenticated/reception/'
+      path: '/reception'
+      fullPath: '/reception/'
+      preLoaderRoute: typeof AuthenticatedReceptionIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reception/appointments': {
       id: '/_authenticated/reception/appointments'
       path: '/reception/appointments'
@@ -407,6 +447,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedNoAccessRoute: typeof AuthenticatedNoAccessRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminServicesRoute: typeof AuthenticatedAdminServicesRoute
   AuthenticatedAdminStaffRoute: typeof AuthenticatedAdminStaffRoute
   AuthenticatedAdminTestsRoute: typeof AuthenticatedAdminTestsRoute
   AuthenticatedPatientsPatientIdRoute: typeof AuthenticatedPatientsPatientIdRoute
@@ -416,6 +457,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLabIndexRoute: typeof AuthenticatedLabIndexRoute
   AuthenticatedOpdIndexRoute: typeof AuthenticatedOpdIndexRoute
   AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
+  AuthenticatedReceptionIndexRoute: typeof AuthenticatedReceptionIndexRoute
   AuthenticatedLabReportRequestIdRoute: typeof AuthenticatedLabReportRequestIdRoute
   AuthenticatedLabRequestRequestIdRoute: typeof AuthenticatedLabRequestRequestIdRoute
   AuthenticatedOpdVisitVisitIdRoute: typeof AuthenticatedOpdVisitVisitIdRoute
@@ -426,6 +468,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedNoAccessRoute: AuthenticatedNoAccessRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminServicesRoute: AuthenticatedAdminServicesRoute,
   AuthenticatedAdminStaffRoute: AuthenticatedAdminStaffRoute,
   AuthenticatedAdminTestsRoute: AuthenticatedAdminTestsRoute,
   AuthenticatedPatientsPatientIdRoute: AuthenticatedPatientsPatientIdRoute,
@@ -436,6 +479,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLabIndexRoute: AuthenticatedLabIndexRoute,
   AuthenticatedOpdIndexRoute: AuthenticatedOpdIndexRoute,
   AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
+  AuthenticatedReceptionIndexRoute: AuthenticatedReceptionIndexRoute,
   AuthenticatedLabReportRequestIdRoute: AuthenticatedLabReportRequestIdRoute,
   AuthenticatedLabRequestRequestIdRoute: AuthenticatedLabRequestRequestIdRoute,
   AuthenticatedOpdVisitVisitIdRoute: AuthenticatedOpdVisitVisitIdRoute,
