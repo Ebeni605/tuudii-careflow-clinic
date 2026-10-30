@@ -15,6 +15,13 @@
       "when": 1793362095197,
       "tag": "0001_self_profile_update",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793362606641,
+      "tag": "0002_phase2_reception",
+      "breakpoints": true
     }
   ]
 }
