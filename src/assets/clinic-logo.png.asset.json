@@ -1,11 +1,11 @@
 {
-  "version": 1,
   "asset_id": "4b17e21f-8b2e-4c1c-bf53-2acd94a4c5fb",
-  "project_id": "f9ad2ee7-6c8b-4732-a1bf-6b352ed14298",
-  "url": "/__l5e/assets-v1/4b17e21f-8b2e-4c1c-bf53-2acd94a4c5fb/clinic-logo.png",
-  "r2_key": "a/v1/f9ad2ee7-6c8b-4732-a1bf-6b352ed14298/4b17e21f-8b2e-4c1c-bf53-2acd94a4c5fb/clinic-logo.png",
-  "original_filename": "clinic-logo.png",
-  "size": 464236,
   "content_type": "image/png",
-  "created_at": "2026-10-30T11:42:14Z"
+  "created_at": "2026-10-30T11:42:14Z",
+  "original_filename": "clinic-logo.png",
+  "project_id": "1ad929bb-af90-4ff7-92c3-014f902fa4cc",
+  "r2_key": "a/v1/1ad929bb-af90-4ff7-92c3-014f902fa4cc/4b17e21f-8b2e-4c1c-bf53-2acd94a4c5fb/clinic-logo.png",
+  "size": 464236,
+  "url": "/__l5e/assets-v1/4b17e21f-8b2e-4c1c-bf53-2acd94a4c5fb/clinic-logo.png",
+  "version": 1
 }
