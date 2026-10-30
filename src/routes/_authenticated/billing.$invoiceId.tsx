@@ -77,12 +77,12 @@ function InvoicePage() {
   async function issue() {
     const { error } = await supabase.from("invoices").update({ status: "issued" }).eq("id", invoiceId);
     if (error) return fail(error.message);
-    toast.success("Invoice issued"); refresh();
+    toast.success("Invoice issued"); refresh(); return true;
   }
   async function removeItem(id: string) {
     const { error } = await supabase.from("invoice_items").delete().eq("id", id);
     if (error) return fail(error.message);
-    refresh();
+    refresh(); return true;
   }
 
   return (
@@ -204,21 +204,21 @@ function InvoicePage() {
           if (reason.length < 5) return fail("Give a reason of at least 5 characters");
           const { error } = await supabase.rpc("void_invoice", { _invoice_id: invoiceId, _reason: reason });
           if (error) return fail(error.message);
-          toast.success("Invoice voided"); refresh();
+          toast.success("Invoice voided"); refresh(); return true;
         }} />
       <ReasonDialog open={!!reverse} onOpenChange={(o) => !o && setReverse(null)} title="Reverse this payment?" description="The payment stays on record and a reversal is added. Use this for refunds or mistakes." confirmLabel="Reverse payment" destructive
         onConfirm={async (reason) => {
           if (reason.length < 5) return fail("Give a reason of at least 5 characters");
           const { error } = await supabase.from("billing_adjustments").insert({ invoice_id: invoiceId, payment_id: reverse, kind: "payment_reversal", reason });
           if (error) return fail(error.message);
-          toast.success("Payment reversed"); setReverse(null); refresh();
+          toast.success("Payment reversed"); setReverse(null); refresh(); return true;
         }} />
       <ReasonDialog open={discountOpen} onOpenChange={setDiscountOpen} title={`Apply a discount of ${money(Number(discountAmt), cur)}?`} confirmLabel="Apply discount"
         onConfirm={async (reason) => {
           if (reason.length < 5) return fail("Give a reason of at least 5 characters");
           const { error } = await supabase.from("billing_adjustments").insert({ invoice_id: invoiceId, kind: "discount", amount: Number(discountAmt), reason });
           if (error) return fail(error.message);
-          toast.success("Discount applied"); setDiscountAmt(""); refresh();
+          toast.success("Discount applied"); setDiscountAmt(""); refresh(); return true;
         }} />
     </div>
   );

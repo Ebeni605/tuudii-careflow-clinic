@@ -51,7 +51,7 @@ export function ReportTable<T extends Record<string, unknown>>({
   );
 }
 
-export function StatGrid({ items, loading }: { items: { label: string; value: ReactNode; tone?: "warn" }[]; loading?: boolean }) {
+export function StatGrid({ items, loading }: { items: { label: string; value: ReactNode; tone?: "warn" | undefined }[]; loading?: boolean }) {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
       {items.map((s) => (
