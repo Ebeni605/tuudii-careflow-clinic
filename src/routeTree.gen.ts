@@ -13,11 +13,13 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedOpdIndexRouteImport } from './routes/_authenticated/opd.index'
 import { Route as AuthenticatedPatientsIndexRouteImport } from './routes/_authenticated/patients.index'
 import { Route as AuthenticatedPatientsPatientIdRouteImport } from './routes/_authenticated/patients.$patientId'
 import { Route as AuthenticatedPatientsNewRouteImport } from './routes/_authenticated/patients.new'
 import { Route as AuthenticatedReceptionAppointmentsRouteImport } from './routes/_authenticated/reception.appointments'
 import { Route as AuthenticatedReceptionQueueRouteImport } from './routes/_authenticated/reception.queue'
+import { Route as AuthenticatedOpdVisitVisitIdRouteImport } from './routes/_authenticated/opd.visit.$visitId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -36,6 +38,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOpdIndexRoute = AuthenticatedOpdIndexRouteImport.update({
+  id: '/opd/',
+  path: '/opd/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedPatientsIndexRoute =
@@ -68,6 +75,12 @@ const AuthenticatedReceptionQueueRoute =
     path: '/reception/queue',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedOpdVisitVisitIdRoute =
+  AuthenticatedOpdVisitVisitIdRouteImport.update({
+    id: '/opd/visit/$visitId',
+    path: '/opd/visit/$visitId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -77,7 +90,9 @@ export interface FileRoutesByFullPath {
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/reception/appointments': typeof AuthenticatedReceptionAppointmentsRoute
   '/reception/queue': typeof AuthenticatedReceptionQueueRoute
+  '/opd/': typeof AuthenticatedOpdIndexRoute
   '/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -87,7 +102,9 @@ export interface FileRoutesByTo {
   '/patients/new': typeof AuthenticatedPatientsNewRoute
   '/reception/appointments': typeof AuthenticatedReceptionAppointmentsRoute
   '/reception/queue': typeof AuthenticatedReceptionQueueRoute
+  '/opd': typeof AuthenticatedOpdIndexRoute
   '/patients': typeof AuthenticatedPatientsIndexRoute
+  '/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -99,7 +116,9 @@ export interface FileRoutesById {
   '/_authenticated/patients/new': typeof AuthenticatedPatientsNewRoute
   '/_authenticated/reception/appointments': typeof AuthenticatedReceptionAppointmentsRoute
   '/_authenticated/reception/queue': typeof AuthenticatedReceptionQueueRoute
+  '/_authenticated/opd/': typeof AuthenticatedOpdIndexRoute
   '/_authenticated/patients/': typeof AuthenticatedPatientsIndexRoute
+  '/_authenticated/opd/visit/$visitId': typeof AuthenticatedOpdVisitVisitIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,7 +130,9 @@ export interface FileRouteTypes {
     | '/patients/new'
     | '/reception/appointments'
     | '/reception/queue'
+    | '/opd/'
     | '/patients/'
+    | '/opd/visit/$visitId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -121,7 +142,9 @@ export interface FileRouteTypes {
     | '/patients/new'
     | '/reception/appointments'
     | '/reception/queue'
+    | '/opd'
     | '/patients'
+    | '/opd/visit/$visitId'
   id:
     | '__root__'
     | '/'
@@ -132,7 +155,9 @@ export interface FileRouteTypes {
     | '/_authenticated/patients/new'
     | '/_authenticated/reception/appointments'
     | '/_authenticated/reception/queue'
+    | '/_authenticated/opd/'
     | '/_authenticated/patients/'
+    | '/_authenticated/opd/visit/$visitId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -171,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/opd/': {
+      id: '/_authenticated/opd/'
+      path: '/opd'
+      fullPath: '/opd/'
+      preLoaderRoute: typeof AuthenticatedOpdIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/patients/': {
       id: '/_authenticated/patients/'
       path: '/patients'
@@ -206,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReceptionQueueRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/opd/visit/$visitId': {
+      id: '/_authenticated/opd/visit/$visitId'
+      path: '/opd/visit/$visitId'
+      fullPath: '/opd/visit/$visitId'
+      preLoaderRoute: typeof AuthenticatedOpdVisitVisitIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -215,7 +254,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedPatientsNewRoute: typeof AuthenticatedPatientsNewRoute
   AuthenticatedReceptionAppointmentsRoute: typeof AuthenticatedReceptionAppointmentsRoute
   AuthenticatedReceptionQueueRoute: typeof AuthenticatedReceptionQueueRoute
+  AuthenticatedOpdIndexRoute: typeof AuthenticatedOpdIndexRoute
   AuthenticatedPatientsIndexRoute: typeof AuthenticatedPatientsIndexRoute
+  AuthenticatedOpdVisitVisitIdRoute: typeof AuthenticatedOpdVisitVisitIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -225,7 +266,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedReceptionAppointmentsRoute:
     AuthenticatedReceptionAppointmentsRoute,
   AuthenticatedReceptionQueueRoute: AuthenticatedReceptionQueueRoute,
+  AuthenticatedOpdIndexRoute: AuthenticatedOpdIndexRoute,
   AuthenticatedPatientsIndexRoute: AuthenticatedPatientsIndexRoute,
+  AuthenticatedOpdVisitVisitIdRoute: AuthenticatedOpdVisitVisitIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
