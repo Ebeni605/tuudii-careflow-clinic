@@ -10,9 +10,9 @@ import { patientName, useStaffNames } from "@/lib/data";
 import { ageFromDob } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/lab/report/$requestId")({
-  beforeLoad: requireArea("patients"),
+  beforeLoad: requireArea("results"),
   head: () => ({ meta: [{ title: "Laboratory Report — Two D Medium Clinic" }] }),
-  component: () => <RequireArea area="patients"><Report /></RequireArea>,
+  component: () => <RequireArea area="results"><Report /></RequireArea>,
 });
 
 const SECTIONS = ["Hematology", "Serology", "Urine Analysis", "Microscopy", "Bacteriology & Parasitology"];

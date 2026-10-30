@@ -33,6 +33,9 @@ describe("clinic workflow rules", () => {
     expect(canAccess(["lab_tech"], "lab")).toBe(true);
     expect(canAccess(["lab_tech"], "admin")).toBe(false);
     expect(canAccess(["admin"], "admin")).toBe(true);
+    expect(canAccess(["receptionist"], "results")).toBe(false);
+    expect(canAccess(["clinician"], "results")).toBe(true);
+    expect(canAccess([], "dashboard")).toBe(false);
   });
 
   it("flags numeric results outside the reference range", () => {
