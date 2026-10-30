@@ -34,3 +34,7 @@
 - Double booking and duplicate queue entries are blocked by partial unique indexes (`appointments_one_per_day`, `visits_one_active_per_patient_day`, `visits_one_per_appointment`); `friendlyDbError` maps them to plain messages.
 - Patient form rules live in `src/lib/patient-schema.ts` (zod, unit-tested) and mirror the `assign_mrn` trigger validations — change both together.
 - Development data must be fictional only.
+- Admin reports come only from admin-only `report_*` RPCs (guarded by `report_guard`, max 2-year range); aggregates expose patient numbers, never names/phones; CSV export goes through `toCsv` in `src/lib/reports.ts` (formula-neutralised) so exported files can't inject spreadsheet formulas.
+- Optional billing is gated by `billing_enabled()` in every billing trigger; invoice item prices are copied from `service_charges` by trigger; payments/adjustments are insert-only and reversals/discounts/voids are admin-only with reasons — `src/lib/billing.ts` mirrors these rules for UI.
+- Password strength and idle sign-out rules live in `src/lib/session.ts` and are shared by the browser and admin server functions, so both sides enforce the same rule.
+- Go-live, backup/restore and rollback procedures live in `docs/GO_LIVE.md`; only mark backup/restore as verified there after evidence is recorded.

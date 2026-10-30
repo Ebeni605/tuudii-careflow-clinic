@@ -4,14 +4,15 @@
 ## Phase 4 — Laboratory (done)
 
 ## Phase 5 — Integration, reports, billing, security, go-live prep
-- [ ] A. Integration: duplicate lab-order guard (same test still open on the visit), row lock against concurrent orders
-- [ ] B. Admin management dashboard (live database counts)
-- [ ] B. Reports (7) with date filters, CSV export, print/PDF, pagination, no names in aggregates
-- [ ] C. Optional billing (off until admin enables): charges, invoices, items, payments, receipts, adjustments, outstanding, daily report
-- [ ] D. Security: revoke anonymous function access, attribute staff/permission changes in audit, server input validation, password reset, idle sign-out, audit page filters
-- [ ] E/G. Backup & recovery + deployment/rollback/admin setup guide (document only what is verified)
-- [ ] F. QA: full journey + role tests in database, browser walkthrough, mobile layout, printing
-- [ ] Final implementation report
+- [x] A. Integration: duplicate lab-order guard (same test still open on the visit), row lock against concurrent orders
+- [x] B. Admin management dashboard (live database counts)
+- [x] B. Reports (7) with date filters, CSV export, print/PDF, pagination, no names in aggregates
+- [x] C. Optional billing (off until admin enables): charges, invoices, items, payments, receipts, adjustments, outstanding, daily report
+- [x] D. Security: revoke anonymous function access, attribute staff/permission changes in audit, server input validation, password reset, idle sign-out, audit page filters
+- [x] E/G. Backup & recovery + deployment/rollback/admin setup guide (document only what is verified)
+- [x] F. QA: full journey + role tests in database, browser walkthrough, mobile layout, printing
+- [x] Final implementation report
+- [ ] Not verified: backup restore in a separate environment, real concurrent-order test, billing browser flow with billing switched on, email reset delivery to a real inbox
 
 ## Later / needs the clinic
 - Clinic to enter validated units/reference intervals; confirm meaning of B/F and BF
