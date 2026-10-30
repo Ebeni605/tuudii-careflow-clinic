@@ -31,11 +31,11 @@ const TABS = {
 } as const;
 type Tab = keyof typeof TABS;
 
-type Search = { tab: Tab; from?: string; to?: string };
+type Search = { tab?: Tab; from?: string; to?: string };
 
 export const Route = createFileRoute("/_authenticated/admin/reports")({
   validateSearch: (s: Record<string, unknown>): Search => ({
-    tab: (typeof s.tab === "string" && s.tab in TABS ? s.tab : "registrations") as Tab,
+    tab: typeof s.tab === "string" && s.tab in TABS ? (s.tab as Tab) : undefined,
     from: typeof s.from === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.from) ? s.from : undefined,
     to: typeof s.to === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s.to) ? s.to : undefined,
   }),
@@ -65,6 +65,7 @@ function Reports() {
   const def = defaultRange();
   const from = search.from ?? def.from;
   const to = search.to ?? def.to;
+  const tab: Tab = search.tab ?? "registrations";
   const [draft, setDraft] = useState({ from, to });
   const problem = rangeProblem(draft.from, draft.to);
 
@@ -82,7 +83,7 @@ function Reports() {
         <CardContent className="flex flex-wrap items-end gap-3 p-4">
           <div className="min-w-56 flex-1 space-y-1.5">
             <Label>Report</Label>
-            <Select value={search.tab} onValueChange={(v) => navigate({ search: (p) => ({ ...p, tab: v as Tab }) })}>
+            <Select value={tab} onValueChange={(v) => navigate({ search: (p) => ({ ...p, tab: v as Tab }) })}>
               <SelectTrigger aria-label="Report"><SelectValue /></SelectTrigger>
               <SelectContent>{(Object.keys(TABS) as Tab[]).map((k) => <SelectItem key={k} value={k}>{TABS[k]}</SelectItem>)}</SelectContent>
             </Select>
@@ -96,18 +97,18 @@ function Reports() {
 
       <div className="print-area space-y-4">
         <div className="hidden print:block">
-          <PrintHeader title={TABS[search.tab]} />
+          <PrintHeader title={TABS[tab]} />
           <p className="mt-2 text-sm">Period: {from} to {to} · Printed {new Date().toLocaleString()}</p>
         </div>
-        <h2 className="text-lg font-bold print:hidden">{TABS[search.tab]} <span className="text-sm font-normal text-muted-foreground">· {from} to {to}</span></h2>
-        {search.tab === "registrations" && <Registrations from={from} to={to} />}
-        {search.tab === "attendance" && <Attendance from={from} to={to} />}
-        {search.tab === "services" && <Services from={from} to={to} />}
-        {search.tab === "lab_volume" && <LabVolume from={from} to={to} />}
-        {search.tab === "lab_tat" && <LabTurnaround from={from} to={to} />}
-        {search.tab === "appointments" && <Appointments from={from} to={to} />}
-        {search.tab === "staff" && <StaffActivity from={from} to={to} />}
-        {search.tab === "billing" && <Billing from={from} to={to} />}
+        <h2 className="text-lg font-bold print:hidden">{TABS[tab]} <span className="text-sm font-normal text-muted-foreground">· {from} to {to}</span></h2>
+        {tab === "registrations" && <Registrations from={from} to={to} />}
+        {tab === "attendance" && <Attendance from={from} to={to} />}
+        {tab === "services" && <Services from={from} to={to} />}
+        {tab === "lab_volume" && <LabVolume from={from} to={to} />}
+        {tab === "lab_tat" && <LabTurnaround from={from} to={to} />}
+        {tab === "appointments" && <Appointments from={from} to={to} />}
+        {tab === "staff" && <StaffActivity from={from} to={to} />}
+        {tab === "billing" && <Billing from={from} to={to} />}
       </div>
     </div>
   );
