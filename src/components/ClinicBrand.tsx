@@ -1,4 +1,6 @@
-import logo from "@/assets/clinic-logo.png.asset.json";
+// Bundled with the app (not loaded from the asset CDN) so the logo always shows, including in remixes and offline-ish clinic networks.
+import logoUrl from "@/assets/clinic-logo.png";
+const logo = { url: logoUrl };
 
 export const CLINIC = {
   name: "KILINIKA G/GALEESSA TUUDII",

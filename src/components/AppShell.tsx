@@ -109,7 +109,10 @@ export function AppShell() {
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="no-print sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-card px-3 shadow-sm">
             <SidebarTrigger aria-label="Toggle menu" />
-            <div className="min-w-0 flex-1 truncate text-sm font-semibold text-primary md:hidden">Two D Medium Clinic</div>
+            <div className="flex min-w-0 flex-1 items-center gap-2 md:hidden">
+              <ClinicLogo className="h-8 w-8 shrink-0" />
+              <span className="truncate text-sm font-semibold text-primary">Two D Medium Clinic</span>
+            </div>
             <div className="hidden flex-1 md:block" />
             {me && (
               <DropdownMenu>
