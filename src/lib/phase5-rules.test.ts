@@ -63,3 +63,30 @@ describe("billing rules", () => {
     expect(priceProblem(-1)).not.toBeNull();
   });
 });
+
+import { idleRemainingMs, IDLE_MINUTES, passwordProblem } from "./session";
+
+describe("staff password rule", () => {
+  it("rejects passwords shorter than 10 characters", () => {
+    expect(passwordProblem("abc12345")).toMatch(/10 characters/);
+  });
+  it("requires both letters and numbers", () => {
+    expect(passwordProblem("onlyletterspass")).toMatch(/letters and numbers/);
+    expect(passwordProblem("1234567890")).toMatch(/letters and numbers/);
+  });
+  it("rejects a password containing the email name", () => {
+    expect(passwordProblem("almaz2026clinic", "almaz@clinic.test")).toMatch(/email/);
+  });
+  it("accepts a 10+ character mix of letters and numbers", () => {
+    expect(passwordProblem("Clinic2026ok")).toBeNull();
+  });
+});
+
+describe("idle sign-out", () => {
+  it("signs out after 30 minutes without activity", () => {
+    expect(IDLE_MINUTES).toBe(30);
+    const last = 1_000_000;
+    expect(idleRemainingMs(last, last + 29 * 60_000)).toBeGreaterThan(0);
+    expect(idleRemainingMs(last, last + 30 * 60_000)).toBeLessThanOrEqual(0);
+  });
+});
