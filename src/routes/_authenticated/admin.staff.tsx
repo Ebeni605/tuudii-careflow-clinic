@@ -44,7 +44,7 @@ function Staff() {
   const { data, refetch } = useQuery({ queryKey: ["staff"], queryFn: () => list() });
   const [open, setOpen] = useState(false);
   const [f, setF] = useState({ fullName: "", email: "", phone: "", password: "", roles: [] as AppRole[] });
-  const [edit, setEdit] = useState<null | { userId: string; name: string; roles: AppRole[]; active: boolean; canSelfVerify: boolean; newPassword: string }>(null);
+  const [edit, setEdit] = useState<null | { userId: string; name: string; roles: AppRole[]; active: boolean; canSelfVerify: boolean; canVerifyLab: boolean; newPassword: string }>(null);
 
   async function add() {
     try {
@@ -56,7 +56,7 @@ function Staff() {
   async function save() {
     if (!edit) return;
     try {
-      await update({ data: { userId: edit.userId, roles: edit.roles, active: edit.active, canSelfVerify: edit.canSelfVerify, ...(edit.newPassword ? { newPassword: edit.newPassword } : {}) } });
+      await update({ data: { userId: edit.userId, roles: edit.roles, active: edit.active, canSelfVerify: edit.canSelfVerify, canVerifyLab: edit.canVerifyLab, ...(edit.newPassword ? { newPassword: edit.newPassword } : {}) } });
       toast.success("Saved"); setEdit(null); refetch();
     } catch (e) { toast.error((e as Error).message); }
   }
@@ -88,10 +88,10 @@ function Staff() {
               <TableRow key={s.id}>
                 <TableCell className="font-medium">{s.fullName}</TableCell>
                 <TableCell>{s.email}</TableCell>
-                <TableCell className="text-sm">{s.roles.map((r) => ROLE_LABELS[r]).join(", ") || "—"}{s.canSelfVerify && <div className="text-xs text-muted-foreground">May self-verify lab results</div>}</TableCell>
+                <TableCell className="text-sm">{s.roles.map((r) => ROLE_LABELS[r]).join(", ") || "—"}{s.canVerifyLab && <div className="text-xs text-muted-foreground">May verify lab results</div>}{s.canSelfVerify && <div className="text-xs text-muted-foreground">May self-verify lab results</div>}</TableCell>
                 <TableCell>{s.active ? "Active" : <span className="text-destructive">Disabled</span>}</TableCell>
                 <TableCell className="text-sm">{s.lastSignIn ? new Date(s.lastSignIn).toLocaleString() : "Never"}</TableCell>
-                <TableCell><Button size="sm" variant="outline" onClick={() => setEdit({ userId: s.id, name: s.fullName, roles: s.roles, active: s.active, canSelfVerify: s.canSelfVerify, newPassword: "" })}>Edit</Button></TableCell>
+                <TableCell><Button size="sm" variant="outline" onClick={() => setEdit({ userId: s.id, name: s.fullName, roles: s.roles, active: s.active, canSelfVerify: s.canSelfVerify, canVerifyLab: s.canVerifyLab, newPassword: "" })}>Edit</Button></TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -103,6 +103,7 @@ function Staff() {
           {edit && <div className="space-y-4">
             <RolePicker value={edit.roles} onChange={(roles) => setEdit({ ...edit, roles })} />
             <label className="flex items-center gap-2 text-sm"><Switch checked={edit.active} onCheckedChange={(active) => setEdit({ ...edit, active })} />Account active</label>
+            <label className="flex items-center gap-2 text-sm"><Switch checked={edit.canVerifyLab} onCheckedChange={(canVerifyLab) => setEdit({ ...edit, canVerifyLab })} />May verify laboratory results (laboratory technicians only)</label>
             <label className="flex items-center gap-2 text-sm"><Switch checked={edit.canSelfVerify} onCheckedChange={(canSelfVerify) => setEdit({ ...edit, canSelfVerify })} />Senior technician — may verify own results</label>
             <div className="space-y-1.5"><Label>Reset password (optional)</Label><Input value={edit.newPassword} onChange={(e) => setEdit({ ...edit, newPassword: e.target.value })} placeholder="New password, min. 8 characters" /></div>
             <Button className="w-full" onClick={save}>Save</Button>

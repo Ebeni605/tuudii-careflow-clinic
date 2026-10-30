@@ -10,6 +10,8 @@ export type Staff = {
   phone: string;
   active: boolean;
   canSelfVerify: boolean;
+  /** Explicit permission to verify lab results (admin-set, enforced by the database). */
+  canVerifyLab: boolean;
   roles: AppRole[];
 };
 
@@ -30,6 +32,7 @@ async function fetchStaff(): Promise<Staff | null> {
     phone: profile?.phone ?? "",
     active,
     canSelfVerify: profile?.can_self_verify ?? false,
+    canVerifyLab: active && (roles ?? []).some((r) => r.role === "lab_tech") && (profile?.can_verify_lab ?? false),
     // A disabled account keeps no effective roles (the database enforces the same rule)
     roles: active ? (roles ?? []).map((r) => r.role as AppRole) : [],
   };
