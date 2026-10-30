@@ -693,6 +693,10 @@ export type Database = {
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
+      update_my_profile: {
+        Args: { _full_name: string; _phone: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "receptionist" | "clinician" | "lab_tech"

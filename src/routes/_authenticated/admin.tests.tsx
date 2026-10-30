@@ -6,10 +6,12 @@ import { Switch } from "@/components/ui/switch";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PageHeader, RequireArea } from "@/components/AppShell";
+import { requireArea } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useLabTests } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/admin/tests")({
+  beforeLoad: requireArea("admin"),
   head: () => ({ meta: [{ title: "Test Catalogue — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="admin"><Tests /></RequireArea>,
 });

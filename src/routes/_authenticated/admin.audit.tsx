@@ -3,10 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PageHeader, RequireArea } from "@/components/AppShell";
+import { requireArea } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useStaffNames } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/admin/audit")({
+  beforeLoad: requireArea("admin"),
   head: () => ({ meta: [{ title: "Audit Log — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="admin"><Audit /></RequireArea>,
 });

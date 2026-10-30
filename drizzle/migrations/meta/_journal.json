@@ -8,6 +8,13 @@
       "when": 1793360679660,
       "tag": "0000_clinic_core_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793362095197,
+      "tag": "0001_self_profile_update",
+      "breakpoints": true
     }
   ]
 }

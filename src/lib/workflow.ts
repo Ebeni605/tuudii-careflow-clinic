@@ -79,7 +79,7 @@ export const ROLE_LABELS: Record<AppRole, string> = {
   lab_tech: "Laboratory Technician",
 };
 
-export type Area = "dashboard" | "reception" | "opd" | "lab" | "admin" | "patients";
+export type Area = "dashboard" | "reception" | "opd" | "lab" | "admin" | "patients" | "results";
 
 export const AREA_ROLES: Record<Area, AppRole[]> = {
   dashboard: ["admin", "receptionist", "clinician", "lab_tech"],
@@ -87,6 +87,7 @@ export const AREA_ROLES: Record<Area, AppRole[]> = {
   reception: ["admin", "receptionist"],
   opd: ["admin", "clinician"],
   lab: ["admin", "lab_tech"],
+  results: ["admin", "clinician", "lab_tech"],
   admin: ["admin"],
 };
 

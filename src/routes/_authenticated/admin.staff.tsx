@@ -12,10 +12,12 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PageHeader, RequireArea } from "@/components/AppShell";
+import { requireArea } from "@/lib/auth";
 import { createStaff, listStaff, updateStaff } from "@/lib/admin.functions";
 import { ROLE_LABELS, type AppRole } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/admin/staff")({
+  beforeLoad: requireArea("admin"),
   head: () => ({ meta: [{ title: "Staff & Roles — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="admin"><Staff /></RequireArea>,
 });

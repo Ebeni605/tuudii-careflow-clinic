@@ -6,13 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PageHeader, RequireArea } from "@/components/AppShell";
+import { LoadError, PageHeader, RequireArea } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName } from "@/lib/data";
 import { ageFromDob, canAccess } from "@/lib/workflow";
-import { useStaff } from "@/lib/auth";
+import { useStaff, requireArea } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/patients/")({
+  beforeLoad: requireArea("patients"),
   head: () => ({ meta: [{ title: "Patients — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="patients"><Patients /></RequireArea>,
 });
@@ -21,7 +22,7 @@ function Patients() {
   const [q, setQ] = useState("");
   const { data: me } = useStaff();
   const term = q.trim().replace(/[%,()]/g, "");
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["patients", term],
     queryFn: async () => {
       let query = supabase.from("patients").select("*").order("created_at", { ascending: false }).limit(50);
@@ -48,6 +49,7 @@ function Patients() {
         <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
         <Input autoFocus className="pl-9" placeholder="e.g. TDC-2026-000001, Chaltu, 0900…" value={q} onChange={(e) => setQ(e.target.value)} />
       </div>
+      {error && <div className="mb-4"><LoadError onRetry={() => refetch()} /></div>}
       <Card>
         <Table>
           <TableHeader>

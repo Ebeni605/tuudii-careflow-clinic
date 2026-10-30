@@ -16,11 +16,12 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { LabRequestForm } from "@/components/LabRequestForm";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, useLiveTable, useServices } from "@/lib/data";
-import { useStaff } from "@/lib/auth";
+import { useStaff, requireArea } from "@/lib/auth";
 import { SERVICE_TEMPLATES, type TemplateField } from "@/lib/templates";
 import { ageFromDob, isResultVisibleToClinician, type LabItemStatus } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/opd/visit/$visitId")({
+  beforeLoad: requireArea("opd"),
   head: () => ({ meta: [{ title: "Consultation — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="opd"><Consultation /></RequireArea>,
 });

@@ -9,12 +9,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PageHeader, RequireArea } from "@/components/AppShell";
+import { requireArea } from "@/lib/auth";
 import { CheckInDialog } from "@/components/CheckInDialog";
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, today, useServices } from "@/lib/data";
 
 export const Route = createFileRoute("/_authenticated/reception/appointments")({
+  beforeLoad: requireArea("reception"),
   head: () => ({ meta: [{ title: "Appointments — Two D Medium Clinic" }] }),
   component: () => <RequireArea area="reception"><Appointments /></RequireArea>,
 });
