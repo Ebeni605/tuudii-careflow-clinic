@@ -10,11 +10,7 @@ export const labRequestQuery = (requestId: string) =>
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lab_requests")
-        .select(
-          "*, patients(*), visits(id, queue_number, queue_date, service_key, checked_in_at), " +
-            "lab_request_items(*, lab_tests(*), lab_results(*)), " +
-            "lab_specimens(*, lab_specimen_tests(item_id)), lab_result_amendments(*)",
-        )
+        .select("*, patients(*), visits(id, queue_number, queue_date, service_key, checked_in_at), lab_request_items(*, lab_tests(*), lab_results(*)), lab_specimens(*, lab_specimen_tests(item_id)), lab_result_amendments(*)")
         .eq("id", requestId)
         .maybeSingle();
       if (error) throw error;
@@ -33,12 +29,7 @@ export const labWorklistQuery = (mode: "open" | "day", from: string, to: string)
     queryFn: async () => {
       let q = supabase
         .from("lab_requests")
-        .select(
-          "id, request_number, priority, status, created_at, requested_by, clinical_notes, consultation_id, " +
-            "patients(id, mrn, first_name, middle_name, last_name, sex, date_of_birth, dob_estimated), " +
-            "visits(queue_number, queue_date), " +
-            "lab_request_items(id, status, verified_at, lab_tests(name, section))",
-        )
+        .select("id, request_number, priority, status, created_at, requested_by, clinical_notes, consultation_id, patients(id, mrn, first_name, middle_name, last_name, sex, date_of_birth, dob_estimated), visits(queue_number, queue_date), lab_request_items(id, status, verified_at, lab_tests(name, section))")
         .order("created_at", { ascending: false })
         .limit(300);
       if (mode === "open") q = q.in("status", ["requested", "in_progress"]);
