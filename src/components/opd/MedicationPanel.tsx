@@ -13,7 +13,7 @@ import { F } from "./Field";
 const ROUTES = ["Oral", "IV", "IM", "SC", "Topical", "Rectal", "Vaginal", "Inhaled", "Eye drops", "Ear drops", "Other"];
 const EMPTY = { medicine: "", dose: "", route: "", frequency: "", duration: "", instructions: "" };
 
-export function MedicationPanel({ visitId, patientId, editable }: { visitId: string; patientId: string; editable: boolean }) {
+export function MedicationPanel({ visitId, patientId, consultationId, editable }: { visitId: string; patientId: string; consultationId: string; editable: boolean }) {
   const { data: meds } = useQuery(medsQuery(visitId));
   const qc = useQueryClient();
   const [m, setM] = useState(EMPTY);
@@ -24,7 +24,7 @@ export function MedicationPanel({ visitId, patientId, editable }: { visitId: str
     if (!m.medicine.trim()) { toast.error("Enter the medicine name"); return; }
     setBusy(true);
     const row = Object.fromEntries(Object.entries(m).map(([k, v]) => [k, v.trim() || null]));
-    const { error } = await supabase.from("medication_instructions").insert({ ...row, medicine: m.medicine.trim(), visit_id: visitId, patient_id: patientId, consultation_id: "00000000-0000-0000-0000-000000000000" });
+    const { error } = await supabase.from("medication_instructions").insert({ ...row, medicine: m.medicine.trim(), visit_id: visitId, patient_id: patientId, consultation_id: consultationId });
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     setM(EMPTY);
