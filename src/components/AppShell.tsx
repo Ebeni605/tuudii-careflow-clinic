@@ -40,7 +40,7 @@ const NAV: { label: string; area: Area; items: { title: string; url: string; ico
 
 function AppSidebar() {
   const { data: me } = useStaff();
-  const { state } = useSidebar();
+  const { state, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const path = useRouterState({ select: (r) => r.location.pathname });
   const roles = me?.roles ?? [];
@@ -69,7 +69,7 @@ function AppSidebar() {
                 {g.items.map((item) => (
                   <SidebarMenuItem key={item.url}>
                     <SidebarMenuButton asChild isActive={path === item.url} tooltip={item.title}>
-                      <Link to={item.url}>
+                      <Link to={item.url} onClick={() => isMobile && setOpenMobile(false)}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>
                       </Link>
