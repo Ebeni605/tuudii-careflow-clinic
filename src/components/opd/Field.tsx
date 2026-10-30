@@ -38,7 +38,7 @@ export function TemplateInput({ field, value, onChange, disabled }: { field: Tem
     return (
       <F label={field.label} required={field.required}>
         <Select disabled={disabled} value={v} onValueChange={onChange}>
-          <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+          <SelectTrigger aria-label={field.label}><SelectValue placeholder="Select" /></SelectTrigger>
           <SelectContent>{field.options!.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}</SelectContent>
         </Select>
       </F>
