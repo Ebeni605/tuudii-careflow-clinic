@@ -117,10 +117,10 @@ export function signingProblems(c: {
     if (c.diagnosisCount === 0) p.push("at least one diagnosis");
     if (blank(c.treatmentNotes)) p.push("treatment / management plan");
   }
-  if (c.serviceKey === "minor_surgery" && c.templateData.consent !== true) p.push("documented consent");
+  if (c.serviceKey === "minor_surgery" && c.templateData["consent"] !== true) p.push("documented consent");
   if (c.serviceKey === "infant_circumcision") {
-    if (c.templateData.guardian_consent !== true) p.push("documented guardian consent");
-    if (blank(c.templateData.guardian_name)) p.push("guardian name");
+    if (c.templateData["guardian_consent"] !== true) p.push("documented guardian consent");
+    if (blank(c.templateData["guardian_name"])) p.push("guardian name");
   }
   return p;
 }

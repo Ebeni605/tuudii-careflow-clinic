@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import type { TemplateField } from "@/lib/templates";
 import { cn } from "@/lib/utils";
 
-export function F({ label, children, className, required }: { label: string; children: React.ReactNode; className?: string; required?: boolean }) {
+export function F({ label, children, className, required }: { label: string; children: React.ReactNode; className?: string | undefined; required?: boolean | undefined }) {
   return (
     <div className={cn("space-y-1.5", className)}>
       <Label>{label}{required && <span className="ml-0.5 text-destructive" aria-label="required">*</span>}</Label>

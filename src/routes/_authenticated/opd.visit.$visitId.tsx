@@ -147,8 +147,8 @@ function Encounter() {
     (acc[f.group ?? `${template.title} details`] ??= []).push(f);
     return acc;
   }, {});
-  const anc = visit.service_key === "anc" && typeof form.template_data.lmp === "string" && form.template_data.lmp
-    ? ancEstimates(form.template_data.lmp as string, today()) : null;
+  const anc = visit.service_key === "anc" && typeof form.template_data["lmp"] === "string" && form.template_data["lmp"]
+    ? ancEstimates(form.template_data["lmp"] as string, today()) : null;
 
   return (
     <div className="space-y-4">
@@ -232,7 +232,7 @@ function Encounter() {
                       {editable && <Button size="sm" variant="outline" onClick={() => { setT("edd", anc.edd); setT("gestational_age_weeks", anc.weeks); }}>Copy estimate into confirmed fields</Button>}
                     </div>
                   )}
-                  {g === "Child and guardian" && editable && p.guardian_name && !form.template_data.guardian_name && (
+                  {g === "Child and guardian" && editable && p.guardian_name && !form.template_data["guardian_name"] && (
                     <Button size="sm" variant="outline" className="mt-3" onClick={() => { setT("guardian_name", p.guardian_name); setT("guardian_relationship", p.guardian_relationship ?? ""); setT("guardian_phone", p.guardian_phone ?? ""); }}>Use guardian details from registration</Button>
                   )}
                 </div>
