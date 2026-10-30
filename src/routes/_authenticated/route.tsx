@@ -17,7 +17,7 @@ function AuthedError({ error, reset }: ErrorComponentProps) {
   const router = useRouter();
   return (
     <div className="mx-auto mt-12 max-w-md p-4">
-      <LoadError message={error.message} onRetry={() => { router.invalidate(); reset(); }} />
+      <LoadError message={(error as Error).message} onRetry={() => { router.invalidate(); reset(); }} />
     </div>
   );
 }
