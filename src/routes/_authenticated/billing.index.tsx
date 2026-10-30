@@ -14,7 +14,7 @@ import { LoadError, PageHeader, PageLoading, RequireArea } from "@/components/Ap
 import { PatientPicker, type PickedPatient } from "@/components/PatientPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { requireArea, useStaff } from "@/lib/auth";
-import { clinicDayRange, patientName, SERVICE_FALLBACK, useServices } from "@/lib/data";
+import { clinicDayRange, patientName, useServices } from "@/lib/data";
 import { clinicToday, friendlyDbError } from "@/lib/patient-schema";
 import { fmtDateTime } from "@/lib/opd-queries";
 import { INVOICE_STATE_LABEL, invoiceState, money, useBillingSettings, type InvoiceState } from "@/lib/billing";
@@ -138,7 +138,7 @@ function NewInvoice() {
       return data;
     },
   });
-  const svcName = (k: string) => services?.find((s) => s.key === k)?.name ?? SERVICE_FALLBACK;
+  const svcName = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
 
   async function create() {
     if (!patient) return;
