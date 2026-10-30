@@ -59,7 +59,7 @@ export const visitLabsQuery = (visitId: string) =>
     queryFn: async () => {
       const { data, error } = await supabase
         .from("lab_requests")
-        .select("*, lab_request_items(*, lab_tests(name, unit, ref_low, ref_high, ref_text, section, display_order))")
+        .select("*, lab_request_items(*, lab_tests(name, section, display_order), lab_results(value, abnormal_flag, comment, unit, ref_low, ref_high, ref_text)), lab_result_amendments(item_id)")
         .eq("visit_id", visitId)
         .order("created_at");
       if (error) throw error;

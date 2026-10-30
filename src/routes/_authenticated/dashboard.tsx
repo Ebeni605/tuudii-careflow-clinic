@@ -37,7 +37,7 @@ function Dashboard() {
       ]);
       if (ve) throw ve;
       const pendingLab = await (seesLab
-        ? supabase.from("lab_request_items").select("id", { count: "exact", head: true }).in("status", ["requested", "collected", "processing", "resulted"])
+        ? supabase.from("lab_request_items").select("id", { count: "exact", head: true }).in("status", ["requested", "collected", "received", "processing", "entered", "awaiting_verification", "rejected"])
         : Promise.resolve({ count: 0 }));
       return {
         visits: visits ?? [],

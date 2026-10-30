@@ -41,7 +41,7 @@ function OpdDashboard() {
     queryKey: ["opd_queue", date],
     queryFn: async () => {
       const { data, error } = await supabase.from("visits")
-        .select("*, patients(mrn, first_name, middle_name, last_name, sex, date_of_birth, dob_estimated, allergies), consultations(status)")
+        .select("*, patients(mrn, first_name, middle_name, last_name, sex, date_of_birth, dob_estimated, allergies), consultations(status), lab_requests(lab_request_items(status))")
         .eq("queue_date", date).order("queue_number");
       if (error) throw error;
       return data ?? [];
@@ -154,6 +154,12 @@ function OpdDashboard() {
                       <div className="flex flex-col items-start gap-1">
                         <StatusBadge status={v.status} />
                         {v.consultations && v.status !== "completed" && <span className="text-[11px] text-muted-foreground">{v.consultations.status === "signed" ? "Note signed" : "Draft note"}</span>}
+                        {(() => {
+                          const li = v.lab_requests.flatMap((r) => r.lab_request_items);
+                          if (!li.length) return null;
+                          const ver = li.filter((i) => i.status === "verified").length;
+                          return <span className={`text-[11px] ${ver ? "font-semibold text-success" : "text-muted-foreground"}`}>Lab: {ver}/{li.length} results verified</span>;
+                        })()}
                       </div>
                     </TableCell>
                     <TableCell className="text-right">
