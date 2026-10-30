@@ -38,16 +38,16 @@ export function LabRequestForm({ visitId, patientId, onDone }: { visitId: string
   }
 
   async function submit() {
-    if (!picked.size) return toast.error("Tick at least one test");
+    if (!picked.size) { toast.error("Tick at least one test"); return; }
     setBusy(true);
     const { data: req, error } = await supabase.from("lab_requests")
       .insert({ visit_id: visitId, patient_id: patientId, priority: urgent ? "urgent" : "routine", clinical_notes: notes || null })
       .select("id, request_number").single();
-    if (error) { setBusy(false); return toast.error(error.message); }
+    if (error) { setBusy(false); { toast.error(error.message); return; } }
     const { error: e2 } = await supabase.from("lab_request_items").insert([...picked].map((id) => ({ lab_request_id: req.id, lab_test_id: id })));
     if (!e2) await supabase.from("visits").update({ status: "awaiting_lab" }).eq("id", visitId);
     setBusy(false);
-    if (e2) return toast.error(e2.message);
+    if (e2) { toast.error(e2.message); return; }
     toast.success(`Lab request ${req.request_number} sent to laboratory`);
     setPicked(new Set()); setNotes(""); setUrgent(false);
     qc.invalidateQueries();

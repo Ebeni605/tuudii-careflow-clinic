@@ -49,7 +49,7 @@ function LabRequest() {
 
   async function enterResult(i: (typeof items)[number]) {
     const val = (values[i.id] ?? i.result_value ?? "").trim();
-    if (!val) return toast.error("Enter a result");
+    if (!val) { toast.error("Enter a result"); return; }
     const t = i.lab_tests!;
     const flag = t.result_type === "numeric" ? abnormalFlag(val, t.ref_low, t.ref_high) : null;
     await update([i.id], { result_value: val, result_comment: comments[i.id] || null, abnormal_flag: flag, status: "resulted" }, "Result entered — awaiting verification");

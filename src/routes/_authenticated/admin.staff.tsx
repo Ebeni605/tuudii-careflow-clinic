@@ -54,7 +54,7 @@ function Staff() {
   async function save() {
     if (!edit) return;
     try {
-      await update({ data: { userId: edit.userId, roles: edit.roles, active: edit.active, canSelfVerify: edit.canSelfVerify, newPassword: edit.newPassword || undefined } });
+      await update({ data: { userId: edit.userId, roles: edit.roles, active: edit.active, canSelfVerify: edit.canSelfVerify, ...(edit.newPassword ? { newPassword: edit.newPassword } : {}) } });
       toast.success("Saved"); setEdit(null); refetch();
     } catch (e) { toast.error((e as Error).message); }
   }

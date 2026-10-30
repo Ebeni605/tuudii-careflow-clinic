@@ -21,7 +21,7 @@ export function CheckInDialog({ patientId, patientLabel, appointmentId, defaultS
   const qc = useQueryClient();
 
   async function submit() {
-    if (!service) return toast.error("Choose the reason for visit");
+    if (!service) { toast.error("Choose the reason for visit"); return; }
     setBusy(true);
     const { data, error } = await supabase.from("visits").insert({
       patient_id: patientId, service_key: service, reception_notes: notes || null,
@@ -29,7 +29,7 @@ export function CheckInDialog({ patientId, patientLabel, appointmentId, defaultS
     }).select("queue_number").single();
     if (!error && appointmentId) await supabase.from("appointments").update({ status: "checked_in" }).eq("id", appointmentId);
     setBusy(false);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(`Checked in — queue number ${data.queue_number}`);
     qc.invalidateQueries();
     setOpen(false);

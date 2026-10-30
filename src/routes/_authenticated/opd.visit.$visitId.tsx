@@ -73,7 +73,7 @@ function Consultation() {
 
   if (!visit) return <div className="text-muted-foreground">Loading…</div>;
   const p = visit.patients!;
-  const template = SERVICE_TEMPLATES[visit.service_key] ?? SERVICE_TEMPLATES.internal_medicine;
+  const template = (SERVICE_TEMPLATES[visit.service_key] ?? SERVICE_TEMPLATES["internal_medicine"])!;
   const svcName = services?.find((s) => s.key === visit.service_key)?.name ?? visit.service_key;
   const editable = canEdit && visit.status !== "completed" && visit.status !== "cancelled";
   const pendingLab = (labs ?? []).some((l) => l.status !== "completed" && l.status !== "cancelled");
@@ -95,7 +95,7 @@ function Consultation() {
   async function move(status: "in_consultation" | "completed" | "waiting") {
     if (status === "completed" && !(await save(true))) return;
     const { error } = await supabase.from("visits").update({ status }).eq("id", visitId);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success(status === "completed" ? "Visit completed" : "Status updated");
     refetchVisit();
   }
@@ -235,9 +235,9 @@ function Consultation() {
             {history?.map((h) => (
               <div key={h.id} className="py-2">
                 <div className="flex justify-between"><b>{services?.find((s) => s.key === h.service_key)?.name}</b><span className="text-muted-foreground">{new Date(h.checked_in_at).toLocaleDateString()}</span></div>
-                {h.consultations?.[0]?.chief_complaint && <div><span className="text-muted-foreground">Complaint:</span> {h.consultations[0].chief_complaint}</div>}
+                {h.consultations?.chief_complaint && <div><span className="text-muted-foreground">Complaint:</span> {h.consultations.chief_complaint}</div>}
                 {h.diagnoses?.length > 0 && <div><span className="text-muted-foreground">Diagnosis:</span> {h.diagnoses.map((d) => d.description).join("; ")}</div>}
-                {h.consultations?.[0]?.treatment_notes && <div><span className="text-muted-foreground">Treatment:</span> {h.consultations[0].treatment_notes}</div>}
+                {h.consultations?.treatment_notes && <div><span className="text-muted-foreground">Treatment:</span> {h.consultations.treatment_notes}</div>}
                 <Link className="text-xs text-primary hover:underline" to="/opd/visit/$visitId" params={{ visitId: h.id }}>Open visit</Link>
               </div>
             ))}
@@ -273,9 +273,9 @@ function VitalsForm({ visitId, patientId, onSaved }: { visitId: string; patientI
   async function save() {
     const row: Record<string, number | string> = { visit_id: visitId, patient_id: patientId };
     for (const [k] of fields) if (v[k]) row[k] = Number(v[k]);
-    if (Object.keys(row).length <= 2) return toast.error("Enter at least one value");
+    if (Object.keys(row).length <= 2) { toast.error("Enter at least one value"); return; }
     const { error } = await supabase.from("vital_signs").insert(row as never);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Vitals recorded");
     setV({}); onSaved();
   }
@@ -296,7 +296,7 @@ function DxForm({ visitId, patientId, onSaved }: { visitId: string; patientId: s
   async function add() {
     if (!desc.trim()) return;
     const { error } = await supabase.from("diagnoses").insert({ visit_id: visitId, patient_id: patientId, description: desc.trim(), icd10_code: icd.trim() || null, diagnosis_type: type });
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     setDesc(""); setIcd(""); onSaved();
   }
   return (

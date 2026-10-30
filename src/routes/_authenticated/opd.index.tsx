@@ -37,7 +37,7 @@ function OpdQueue() {
 
   async function call(id: string) {
     const { error } = await supabase.from("visits").update({ status: "in_consultation" }).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     navigate({ to: "/opd/visit/$visitId", params: { visitId: id } });
   }
 

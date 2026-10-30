@@ -140,7 +140,7 @@ function PatientProfile() {
               setBusy(true);
               const { error } = await supabase.from("patients").update(toPatientRow(v)).eq("id", p.id);
               setBusy(false);
-              if (error) return toast.error(error.message);
+              if (error) { toast.error(error.message); return; }
               toast.success("Patient updated");
               setEditing(false);
               qc.invalidateQueries({ queryKey: ["patient", patientId] });

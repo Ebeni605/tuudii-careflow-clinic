@@ -19,7 +19,7 @@ function Tests() {
   const qc = useQueryClient();
   async function patch(id: string, p: Record<string, unknown>) {
     const { error } = await supabase.from("lab_tests").update(p as never).eq("id", id);
-    if (error) return toast.error(error.message);
+    if (error) { toast.error(error.message); return; }
     toast.success("Saved");
     qc.invalidateQueries({ queryKey: ["lab_tests"] });
   }
