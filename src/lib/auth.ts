@@ -1,7 +1,7 @@
 import { queryOptions, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { redirect, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { canAccess, type AppRole, type Area } from "./workflow";
+import { canAccess, homePathFor, type AppRole, type Area } from "./workflow";
 
 export type Staff = {
   id: string;
