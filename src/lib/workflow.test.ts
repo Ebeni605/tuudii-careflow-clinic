@@ -39,6 +39,21 @@ describe("clinic workflow rules", () => {
     expect(canAccess([], "dashboard")).toBe(false);
   });
 
+  it("only the administrator uses the whole-clinic dashboard", () => {
+    expect(canAccess(["administrator"], "dashboard")).toBe(true);
+    expect(canAccess(["receptionist"], "dashboard")).toBe(false);
+    expect(canAccess(["opd_clinician"], "dashboard")).toBe(false);
+    expect(canAccess(["laboratory_technician"], "dashboard")).toBe(false);
+  });
+
+  it("each role lands on its own dashboard after sign-in", () => {
+    expect(homePathFor(["administrator"])).toBe("/dashboard");
+    expect(homePathFor(["receptionist"])).toBe("/reception");
+    expect(homePathFor(["opd_clinician"])).toBe("/opd");
+    expect(homePathFor(["laboratory_technician"])).toBe("/lab");
+    expect(homePathFor([])).toBe("/no-access");
+  });
+
   it("flags numeric results outside the reference range", () => {
     expect(abnormalFlag("9", 12, 17)).toBe("L");
     expect(abnormalFlag("18", 12, 17)).toBe("H");

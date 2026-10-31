@@ -142,6 +142,12 @@ export const updateStaff = createServerFn({ method: "POST" })
       const { error } = await db.from("user_roles").insert(add.map((r) => ({ user_id: data.userId, role: r })));
       if (error) throw new Error(error.message);
     }
+    // A disabled account is also blocked from signing in at all (not only from seeing data)
+    {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, { ban_duration: data.active ? "none" : "876000h" });
+      if (error) throw new Error(error.message);
+    }
     if (data.newPassword) {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const { error } = await supabaseAdmin.auth.admin.updateUserById(data.userId, { password: data.newPassword });

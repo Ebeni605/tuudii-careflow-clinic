@@ -25,7 +25,7 @@ function NoAccess() {
             : "Your role does not include this section. Contact the administrator if you need access."}
       </p>
       <div className="mt-5 flex justify-center gap-2">
-        {me?.roles.length ? <Button asChild><Link to="/dashboard">Go to dashboard</Link></Button> : null}
+        {me?.roles.length ? <Button asChild><Link to="/dashboard">Go to my dashboard</Link></Button> : null}
         <Button variant="outline" onClick={signOut}>Sign out</Button>
       </div>
     </div>
