@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { abnormalFlag, canAccess, canLabMove, canVerify, canVisitMove, isResultVisibleToClinician } from "./workflow";
+import { abnormalFlag, canAccess, canLabMove, canVerify, canVisitMove, homePathFor, isResultVisibleToClinician } from "./workflow";
 
 describe("clinic workflow rules", () => {
   it("lab tests go requested → collected → received → processing → entered → awaiting verification → verified", () => {
