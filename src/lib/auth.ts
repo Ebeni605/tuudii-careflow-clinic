@@ -1,7 +1,7 @@
 import { queryOptions, useQuery, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { redirect, useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { canAccess, type AppRole, type Area } from "./workflow";
+import { canAccess, homePathFor, type AppRole, type Area } from "./workflow";
 
 export type Staff = {
   id: string;
@@ -32,7 +32,7 @@ async function fetchStaff(): Promise<Staff | null> {
     phone: profile?.phone ?? "",
     active,
     canSelfVerify: profile?.can_self_verify ?? false,
-    canVerifyLab: active && (roles ?? []).some((r) => r.role === "lab_tech") && (profile?.can_verify_lab ?? false),
+    canVerifyLab: active && (roles ?? []).some((r) => r.role === "laboratory_technician") && (profile?.can_verify_lab ?? false),
     // A disabled account keeps no effective roles (the database enforces the same rule)
     roles: active ? (roles ?? []).map((r) => r.role as AppRole) : [],
   };
@@ -51,6 +51,14 @@ export function requireArea(area: Area) {
     if (!me) throw redirect({ to: "/auth" });
     if (!canAccess(me.roles, area)) throw redirect({ to: "/no-access" });
   };
+}
+
+/** Guard for /dashboard (the post-sign-in landing): non-administrators go to their own department dashboard. */
+export async function requireDashboardOrHome({ context }: { context: { queryClient: QueryClient } }) {
+  const me = await context.queryClient.ensureQueryData(staffQuery);
+  if (!me) throw redirect({ to: "/auth" });
+  const home = homePathFor(me.roles);
+  if (home !== "/dashboard") throw redirect({ to: home, replace: true });
 }
 
 export function useSignOut() {

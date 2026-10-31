@@ -31,7 +31,7 @@ function Patients() {
   const [archived, setArchived] = useState(false);
   const [page, setPage] = useState(0);
   const { data: me } = useStaff();
-  const isAdmin = !!me?.roles.includes("admin");
+  const isAdmin = !!me?.roles.includes("administrator");
   const term = q.trim().replace(/[%,()*\\]/g, "");
 
   const { data, isLoading, isFetching, error, refetch } = useQuery({

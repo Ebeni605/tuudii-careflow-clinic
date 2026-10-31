@@ -33,7 +33,7 @@ function OpdDashboard() {
   const { data: me } = useStaff();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const isClinician = !!me?.roles.includes("clinician");
+  const isClinician = !!me?.roles.includes("opd_clinician");
   useLiveTable("visits", [["opd_queue"]]);
   useLiveTable("lab_request_items", [["opd_queue"]]);
 

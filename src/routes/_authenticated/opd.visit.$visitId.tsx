@@ -46,7 +46,7 @@ function Encounter() {
   const { data: services } = useServices();
   const { data: names } = useStaffNames();
   const qc = useQueryClient();
-  const isClinician = !!me?.roles.includes("clinician");
+  const isClinician = !!me?.roles.includes("opd_clinician");
   useLiveTable("lab_request_items", [["visit_labs", visitId]]);
   useLiveTable("visits", [["visit", visitId]]);
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { abnormalFlag, canAccess, canLabMove, canVerify, canVisitMove, isResultVisibleToClinician } from "./workflow";
+import { abnormalFlag, canAccess, canLabMove, canVerify, canVisitMove, homePathFor, isResultVisibleToClinician } from "./workflow";
 
 describe("clinic workflow rules", () => {
   it("lab tests go requested → collected → received → processing → entered → awaiting verification → verified", () => {
@@ -30,13 +30,28 @@ describe("clinic workflow rules", () => {
   it("each role reaches only its own department", () => {
     expect(canAccess(["receptionist"], "opd")).toBe(false);
     expect(canAccess(["receptionist"], "reception")).toBe(true);
-    expect(canAccess(["clinician"], "lab")).toBe(false);
-    expect(canAccess(["lab_tech"], "lab")).toBe(true);
-    expect(canAccess(["lab_tech"], "admin")).toBe(false);
-    expect(canAccess(["admin"], "admin")).toBe(true);
+    expect(canAccess(["opd_clinician"], "lab")).toBe(false);
+    expect(canAccess(["laboratory_technician"], "lab")).toBe(true);
+    expect(canAccess(["laboratory_technician"], "admin")).toBe(false);
+    expect(canAccess(["administrator"], "admin")).toBe(true);
     expect(canAccess(["receptionist"], "results")).toBe(false);
-    expect(canAccess(["clinician"], "results")).toBe(true);
+    expect(canAccess(["opd_clinician"], "results")).toBe(true);
     expect(canAccess([], "dashboard")).toBe(false);
+  });
+
+  it("only the administrator uses the whole-clinic dashboard", () => {
+    expect(canAccess(["administrator"], "dashboard")).toBe(true);
+    expect(canAccess(["receptionist"], "dashboard")).toBe(false);
+    expect(canAccess(["opd_clinician"], "dashboard")).toBe(false);
+    expect(canAccess(["laboratory_technician"], "dashboard")).toBe(false);
+  });
+
+  it("each role lands on its own dashboard after sign-in", () => {
+    expect(homePathFor(["administrator"])).toBe("/dashboard");
+    expect(homePathFor(["receptionist"])).toBe("/reception");
+    expect(homePathFor(["opd_clinician"])).toBe("/opd");
+    expect(homePathFor(["laboratory_technician"])).toBe("/lab");
+    expect(homePathFor([])).toBe("/no-access");
   });
 
   it("flags numeric results outside the reference range", () => {

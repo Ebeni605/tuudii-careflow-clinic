@@ -6,11 +6,11 @@ import { LoadError, PageHeader } from "@/components/AppShell";
 import { ClipboardList, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { clinicDayRange, today, useLiveTable, useServices } from "@/lib/data";
-import { requireArea, useStaff } from "@/lib/auth";
+import { requireDashboardOrHome, useStaff } from "@/lib/auth";
 import { canAccess } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  beforeLoad: requireArea("dashboard"),
+  beforeLoad: requireDashboardOrHome,
   head: () => ({ meta: [{ title: "Dashboard — Two D Medium Clinic" }] }),
   component: Dashboard,
 });
@@ -19,7 +19,7 @@ function Dashboard() {
   const { data: me } = useStaff();
   const { data: services } = useServices();
   const roles = me?.roles ?? [];
-  const isAdmin = roles.includes("admin");
+  const isAdmin = roles.includes("administrator");
   const seesLab = canAccess(roles, "lab") || canAccess(roles, "opd");
   useLiveTable("visits", [["dash"]]);
   useLiveTable("lab_request_items", [["dash"]]);

@@ -46,7 +46,13 @@ function AuthPage() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) { toast.error(error.message.includes("Invalid") ? "Wrong email or password" : "Sign in failed. Check your connection and try again."); return; }
+    if (error) {
+      const msg = error.message.toLowerCase();
+      toast.error(msg.includes("invalid") ? "Wrong email or password"
+        : msg.includes("banned") ? "This account has been disabled. Contact the clinic administrator."
+        : "Sign in failed. Check your connection and try again.");
+      return;
+    }
     qc.clear();
     navigate({ to: "/dashboard", replace: true });
   }
