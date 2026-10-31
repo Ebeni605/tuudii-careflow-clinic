@@ -53,6 +53,14 @@ export function requireArea(area: Area) {
   };
 }
 
+/** Guard for /dashboard (the post-sign-in landing): non-administrators go to their own department dashboard. */
+export async function requireDashboardOrHome({ context }: { context: { queryClient: QueryClient } }) {
+  const me = await context.queryClient.ensureQueryData(staffQuery);
+  if (!me) throw redirect({ to: "/auth" });
+  const home = homePathFor(me.roles);
+  if (home !== "/dashboard") throw redirect({ to: home, replace: true });
+}
+
 export function useSignOut() {
   const qc = useQueryClient();
   const navigate = useNavigate();

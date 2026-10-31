@@ -228,7 +228,8 @@ export const ROLE_LABELS: Record<AppRole, string> = {
 export type Area = "dashboard" | "reception" | "opd" | "lab" | "admin" | "patients" | "results" | "billing";
 
 export const AREA_ROLES: Record<Area, AppRole[]> = {
-  dashboard: ["administrator", "receptionist", "opd_clinician", "laboratory_technician"],
+  // The whole-clinic dashboard is the administrator's home; other staff land on their department dashboard
+  dashboard: ["administrator"],
   patients: ["administrator", "receptionist", "opd_clinician", "laboratory_technician"],
   reception: ["administrator", "receptionist"],
   opd: ["administrator", "opd_clinician"],
@@ -241,6 +242,17 @@ export const AREA_ROLES: Record<Area, AppRole[]> = {
 
 export function canAccess(roles: AppRole[], area: Area) {
   return roles.some((r) => AREA_ROLES[area].includes(r));
+}
+
+export type HomePath = "/dashboard" | "/reception" | "/opd" | "/lab" | "/no-access";
+
+/** Where a staff member lands after sign-in: their own department dashboard. */
+export function homePathFor(roles: AppRole[]): HomePath {
+  if (roles.includes("administrator")) return "/dashboard";
+  if (roles.includes("receptionist")) return "/reception";
+  if (roles.includes("opd_clinician")) return "/opd";
+  if (roles.includes("laboratory_technician")) return "/lab";
+  return "/no-access";
 }
 
 export function ageFromDob(dob: string | null, now = new Date(), estimated = false): string | null {

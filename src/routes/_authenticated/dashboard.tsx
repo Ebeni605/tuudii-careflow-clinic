@@ -6,11 +6,11 @@ import { LoadError, PageHeader } from "@/components/AppShell";
 import { ClipboardList, ShieldCheck } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { clinicDayRange, today, useLiveTable, useServices } from "@/lib/data";
-import { requireArea, useStaff } from "@/lib/auth";
+import { requireDashboardOrHome, useStaff } from "@/lib/auth";
 import { canAccess } from "@/lib/workflow";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
-  beforeLoad: requireArea("dashboard"),
+  beforeLoad: requireDashboardOrHome,
   head: () => ({ meta: [{ title: "Dashboard — Two D Medium Clinic" }] }),
   component: Dashboard,
 });
