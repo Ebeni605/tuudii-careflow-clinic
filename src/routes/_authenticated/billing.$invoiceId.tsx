@@ -49,7 +49,7 @@ function InvoicePage() {
   const { invoiceId } = Route.useParams();
   const qc = useQueryClient();
   const { data: me } = useStaff();
-  const isAdmin = !!me?.roles.includes("admin");
+  const isAdmin = !!me?.roles.includes("administrator");
   const settings = useBillingSettings();
   const q = useQuery(invoiceQuery(invoiceId));
   const [voidOpen, setVoidOpen] = useState(false);

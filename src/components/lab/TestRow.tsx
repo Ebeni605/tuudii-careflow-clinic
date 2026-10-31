@@ -32,7 +32,7 @@ export function TestRow({ item, me, names, amendments, accession, onChange }: {
 }) {
   const t = item.lab_tests!;
   const res = item.lab_results;
-  const isTech = me.roles.includes("lab_tech");
+  const isTech = me.roles.includes("laboratory_technician");
   const [value, setValue] = useState(res?.value ?? "");
   const [comment, setComment] = useState(res?.comment ?? "");
   const [abn, setAbn] = useState(res?.abnormal_flag === "A");

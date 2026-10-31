@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_authenticated/billing/")({
 
 function Billing() {
   const { data: me } = useStaff();
-  const isAdmin = !!me?.roles.includes("admin");
+  const isAdmin = !!me?.roles.includes("administrator");
   const settings = useBillingSettings();
   const [day, setDay] = useState(clinicToday());
   const [filter, setFilter] = useState<"all" | InvoiceState>("all");

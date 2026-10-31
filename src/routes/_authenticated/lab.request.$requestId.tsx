@@ -40,7 +40,7 @@ function LabRequest() {
   if (error) return <LoadError onRetry={() => refetch()} />;
   if (!req) return <LoadError message="This laboratory request was not found." />;
   const p = req.patients!;
-  const isTech = me.roles.includes("lab_tech");
+  const isTech = me.roles.includes("laboratory_technician");
   const order = (s: string | undefined) => { const i = LAB_SECTIONS.indexOf(s ?? ""); return i < 0 ? 99 : i; };
   const items = [...req.lab_request_items].sort((a, b) =>
     order(a.lab_tests?.section) - order(b.lab_tests?.section) || (a.lab_tests?.display_order ?? 0) - (b.lab_tests?.display_order ?? 0));

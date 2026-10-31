@@ -30,12 +30,12 @@ describe("clinic workflow rules", () => {
   it("each role reaches only its own department", () => {
     expect(canAccess(["receptionist"], "opd")).toBe(false);
     expect(canAccess(["receptionist"], "reception")).toBe(true);
-    expect(canAccess(["clinician"], "lab")).toBe(false);
-    expect(canAccess(["lab_tech"], "lab")).toBe(true);
-    expect(canAccess(["lab_tech"], "admin")).toBe(false);
-    expect(canAccess(["admin"], "admin")).toBe(true);
+    expect(canAccess(["opd_clinician"], "lab")).toBe(false);
+    expect(canAccess(["laboratory_technician"], "lab")).toBe(true);
+    expect(canAccess(["laboratory_technician"], "admin")).toBe(false);
+    expect(canAccess(["administrator"], "admin")).toBe(true);
     expect(canAccess(["receptionist"], "results")).toBe(false);
-    expect(canAccess(["clinician"], "results")).toBe(true);
+    expect(canAccess(["opd_clinician"], "results")).toBe(true);
     expect(canAccess([], "dashboard")).toBe(false);
   });
 

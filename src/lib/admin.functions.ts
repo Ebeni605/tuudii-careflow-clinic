@@ -5,7 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { AppRole } from "./workflow";
 
 // Server-side validation (the browser form validates too, but never trust the browser)
-const role = z.enum(["admin", "receptionist", "clinician", "lab_tech"]);
+const role = z.enum(["administrator", "receptionist", "opd_clinician", "laboratory_technician"]);
 const password = z.string().superRefine((v, ctx) => {
   const problem = passwordProblem(v);
   if (problem) ctx.addIssue({ code: "custom", message: problem });
@@ -35,7 +35,7 @@ export const bootstrapAdmin = createServerFn({ method: "POST" })
     const { count } = await supabaseAdmin
       .from("user_roles")
       .select("id", { count: "exact", head: true })
-      .eq("role", "admin");
+      .eq("role", "administrator");
     if ((count ?? 0) > 0) throw new Error("An administrator already exists. Ask them to create your account.");
     const { data: created, error } = await supabaseAdmin.auth.admin.createUser({
       email: data.email,
@@ -45,13 +45,13 @@ export const bootstrapAdmin = createServerFn({ method: "POST" })
     });
     if (error || !created.user) throw new Error(error?.message ?? "Could not create user");
     await supabaseAdmin.from("profiles").upsert({ id: created.user.id, full_name: data.fullName });
-    await supabaseAdmin.from("user_roles").insert({ user_id: created.user.id, role: "admin" });
+    await supabaseAdmin.from("user_roles").insert({ user_id: created.user.id, role: "administrator" });
     await auditAccountEvent(created.user.id, created.user.id, "FIRST_ADMIN_CREATED", { email: data.email });
     return { ok: true };
   });
 
 async function assertAdmin(context: { supabase: any; userId: string }) {
-  const { data } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+  const { data } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "administrator" });
   if (!data) throw new Error("Only administrators can manage staff");
 }
 
@@ -117,7 +117,7 @@ export const updateStaff = createServerFn({ method: "POST" })
     }), d))
   .handler(async ({ data, context }) => {
     await assertAdmin(context);
-    if (data.userId === context.userId && (!data.roles.includes("admin") || !data.active)) {
+    if (data.userId === context.userId && (!data.roles.includes("administrator") || !data.active)) {
       throw new Error("You cannot remove your own administrator access");
     }
     // Profile flags and roles are written with the administrator's own session, so RLS applies
@@ -129,7 +129,7 @@ export const updateStaff = createServerFn({ method: "POST" })
     if (pe) throw new Error(pe.message);
     const { data: current, error: ce } = await db.from("user_roles").select("role").eq("user_id", data.userId);
     if (ce) throw new Error(ce.message);
-    type Role = "admin" | "receptionist" | "clinician" | "lab_tech";
+    type Role = "administrator" | "receptionist" | "opd_clinician" | "laboratory_technician";
     const have = new Set<Role>((current ?? []).map((r) => r.role as Role));
     const want = new Set<Role>(data.roles as Role[]);
     const remove = [...have].filter((r) => !want.has(r));

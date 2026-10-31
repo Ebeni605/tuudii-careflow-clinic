@@ -39,7 +39,7 @@ function PatientProfile() {
   const [busy, setBusy] = useState(false);
   const roles = me?.roles ?? [];
   const isReception = canAccess(roles, "reception");
-  const isAdmin = roles.includes("admin");
+  const isAdmin = roles.includes("administrator");
   const seesResults = canAccess(roles, "results");
 
   const { data: p, error, isLoading, refetch } = useQuery({

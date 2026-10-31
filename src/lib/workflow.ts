@@ -1,7 +1,7 @@
 // Shared clinical workflow rules. The database triggers enforce the same rules;
 // this module drives which buttons the UI shows.
 
-export type AppRole = "admin" | "receptionist" | "clinician" | "lab_tech";
+export type AppRole = "administrator" | "receptionist" | "opd_clinician" | "laboratory_technician";
 
 export type VisitStatus =
   | "waiting"
@@ -219,24 +219,24 @@ export function referenceText(r: { ref_low: number | null; ref_high: number | nu
 }
 
 export const ROLE_LABELS: Record<AppRole, string> = {
-  admin: "Administrator",
+  administrator: "Administrator",
   receptionist: "Receptionist",
-  clinician: "OPD Clinician",
-  lab_tech: "Laboratory Technician",
+  opd_clinician: "OPD Clinician",
+  laboratory_technician: "Laboratory Technician",
 };
 
 export type Area = "dashboard" | "reception" | "opd" | "lab" | "admin" | "patients" | "results" | "billing";
 
 export const AREA_ROLES: Record<Area, AppRole[]> = {
-  dashboard: ["admin", "receptionist", "clinician", "lab_tech"],
-  patients: ["admin", "receptionist", "clinician", "lab_tech"],
-  reception: ["admin", "receptionist"],
-  opd: ["admin", "clinician"],
-  lab: ["admin", "lab_tech"],
-  results: ["admin", "clinician", "lab_tech"],
-  admin: ["admin"],
+  dashboard: ["administrator", "receptionist", "opd_clinician", "laboratory_technician"],
+  patients: ["administrator", "receptionist", "opd_clinician", "laboratory_technician"],
+  reception: ["administrator", "receptionist"],
+  opd: ["administrator", "opd_clinician"],
+  lab: ["administrator", "laboratory_technician"],
+  results: ["administrator", "opd_clinician", "laboratory_technician"],
+  admin: ["administrator"],
   // Optional billing is an administrative feature used by reception, not a department
-  billing: ["admin", "receptionist"],
+  billing: ["administrator", "receptionist"],
 };
 
 export function canAccess(roles: AppRole[], area: Area) {

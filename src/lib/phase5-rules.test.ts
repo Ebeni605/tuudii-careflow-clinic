@@ -42,9 +42,9 @@ describe("report date ranges", () => {
 describe("billing rules", () => {
   it("only administrators and reception may use billing", () => {
     expect(canAccess(["receptionist"], "billing")).toBe(true);
-    expect(canAccess(["admin"], "billing")).toBe(true);
-    expect(canAccess(["clinician"], "billing")).toBe(false);
-    expect(canAccess(["lab_tech"], "billing")).toBe(false);
+    expect(canAccess(["administrator"], "billing")).toBe(true);
+    expect(canAccess(["opd_clinician"], "billing")).toBe(false);
+    expect(canAccess(["laboratory_technician"], "billing")).toBe(false);
   });
   it("shows invoice state from status and balance", () => {
     expect(invoiceState("draft", 100, 100)).toBe("draft");

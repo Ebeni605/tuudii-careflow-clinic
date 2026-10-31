@@ -22,7 +22,7 @@ export const Route = createFileRoute("/_authenticated/admin/staff")({
   component: () => <RequireArea area="admin"><Staff /></RequireArea>,
 });
 
-const ALL: AppRole[] = ["admin", "receptionist", "clinician", "lab_tech"];
+const ALL: AppRole[] = ["administrator", "receptionist", "opd_clinician", "laboratory_technician"];
 
 function RolePicker({ value, onChange }: { value: AppRole[]; onChange: (r: AppRole[]) => void }) {
   return (

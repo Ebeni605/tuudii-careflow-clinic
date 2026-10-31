@@ -19,7 +19,7 @@ function Dashboard() {
   const { data: me } = useStaff();
   const { data: services } = useServices();
   const roles = me?.roles ?? [];
-  const isAdmin = roles.includes("admin");
+  const isAdmin = roles.includes("administrator");
   const seesLab = canAccess(roles, "lab") || canAccess(roles, "opd");
   useLiveTable("visits", [["dash"]]);
   useLiveTable("lab_request_items", [["dash"]]);
