@@ -5,15 +5,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PageHeader, RequireArea } from "@/components/AppShell";
 import { PatientForm } from "@/components/PatientForm";
+import { ServicePicker } from "@/components/ServicePicker";
 import { supabase } from "@/integrations/supabase/client";
 import { requireArea } from "@/lib/auth";
-import { patientName, useServices } from "@/lib/data";
+import { patientName } from "@/lib/data";
+import { serviceChoiceProblem, serviceDetailFor } from "@/lib/services";
 import { friendlyDbError, toPatientRow, type PatientFormValues } from "@/lib/patient-schema";
 import { ageFromDob } from "@/lib/workflow";
 
@@ -30,16 +30,18 @@ function NewPatient() {
   const { walkin } = Route.useSearch();
   const navigate = useNavigate();
   const qc = useQueryClient();
-  const { data: services } = useServices();
   const [busy, setBusy] = useState(false);
   const [checkIn, setCheckIn] = useState(!!walkin);
   const [service, setService] = useState("");
+  const [detail, setDetail] = useState("");
   const [pending, setPending] = useState<PatientFormValues | null>(null);
   const [matches, setMatches] = useState<Match[]>([]);
   const [formKey] = useState(0);
 
   async function start(v: PatientFormValues) {
     if (checkIn && !service) { toast.error("Choose the service for today's visit, or turn off check-in"); return; }
+    const problem = checkIn ? serviceChoiceProblem(service, detail) : null;
+    if (problem) { toast.error(problem); return; }
     setBusy(true);
     const row = toPatientRow(v);
     const { data, error } = await supabase.rpc("find_possible_duplicates", {
@@ -57,7 +59,7 @@ function NewPatient() {
     if (error) { setBusy(false); toast.error(friendlyDbError(error.message)); return; }
     let queueMsg = "";
     if (checkIn && service) {
-      const { data: visit, error: ve } = await supabase.from("visits").insert({ patient_id: data.id, service_key: service }).select("queue_number").single();
+      const { data: visit, error: ve } = await supabase.from("visits").insert({ patient_id: data.id, service_key: service, service_detail: serviceDetailFor(service, detail) }).select("queue_number").single();
       if (ve) toast.error(`Registered, but check-in failed: ${friendlyDbError(ve.message)}`);
       else queueMsg = ` · queue number ${visit.queue_number}`;
     }
@@ -83,12 +85,8 @@ function NewPatient() {
                 <Switch checked={checkIn} onCheckedChange={setCheckIn} /> Check in today as a walk-in (adds the patient to the OPD queue)
               </label>
               {checkIn && (
-                <div className="mt-3 max-w-md space-y-1.5">
-                  <Label>Service for today's visit *</Label>
-                  <Select value={service} onValueChange={setService}>
-                    <SelectTrigger aria-label="Service for today's visit"><SelectValue placeholder="Select service" /></SelectTrigger>
-                    <SelectContent>{services?.map((s) => <SelectItem key={s.key} value={s.key}>{s.name}</SelectItem>)}</SelectContent>
-                  </Select>
+                <div className="mt-3 max-w-md">
+                  <ServicePicker label="Service for today's visit *" value={service} detail={detail} onChange={(k, d) => { setService(k); setDetail(d); }} />
                 </div>
               )}
             </div>

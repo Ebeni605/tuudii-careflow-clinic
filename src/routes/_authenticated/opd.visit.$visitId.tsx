@@ -21,6 +21,7 @@ import { AmendmentsPanel } from "@/components/opd/AmendmentsPanel";
 import { ClinicalHistory } from "@/components/opd/ClinicalHistory";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, today, useLiveTable, useServices, useStaffNames } from "@/lib/data";
+import { serviceLabel } from "@/lib/services";
 import { consultQuery, dxQuery, fmtDate, fmtDateTime, fmtTime, visitLabsQuery, visitQuery } from "@/lib/opd-queries";
 import { useStaff, requireArea } from "@/lib/auth";
 import { templateFor, type TemplateField } from "@/lib/templates";
@@ -74,7 +75,7 @@ function Encounter() {
   const p = visit.patients!;
   const status = visit.status as VisitStatus;
   const template = templateFor(visit.service_key);
-  const svcName = services?.find((s) => s.key === visit.service_key)?.name ?? visit.service_key;
+  const svcName = serviceLabel(services, visit.service_key, visit.service_detail);
   const isOpen = OPEN_ENCOUNTER_STATUSES.includes(status);
   const signed = consult?.status === "signed";
   const editable = isClinician && isOpen && !!consult && !signed;

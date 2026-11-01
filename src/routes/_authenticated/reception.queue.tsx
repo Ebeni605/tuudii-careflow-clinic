@@ -15,6 +15,9 @@ import { usePatientSearch } from "@/components/PatientPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, today, useLiveTable, useServices, useStaffNames, VISIT_STATUS_LABEL } from "@/lib/data";
 import { requireArea } from "@/lib/auth";
+import { serviceChoiceProblem, serviceDetailFor, serviceLabel } from "@/lib/services";
+import { ServicePicker } from "@/components/ServicePicker";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { friendlyDbError } from "@/lib/patient-schema";
 
 export const Route = createFileRoute("/_authenticated/reception/queue")({
@@ -40,10 +43,10 @@ function Queue() {
     },
   });
   const rows = (queue ?? []).filter((v) => status === "all" || (status === "active" ? ["waiting", "in_consultation", "awaiting_lab", "ready_for_review"].includes(v.status) : v.status === status));
-  const svc = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
+  const [changing, setChanging] = useState<{ id: string; service_key: string; service_detail: string | null } | null>(null);
   const inQueue = new Set((queue ?? []).filter((v) => ["waiting", "in_consultation", "awaiting_lab", "ready_for_review"].includes(v.status)).map((v) => v.patient_id));
 
-  async function update(id: string, patch: { status?: "cancelled" | "no_show"; service_key?: string }) {
+  async function update(id: string, patch: { status?: "cancelled" | "no_show"; service_key?: string; service_detail?: string | null }) {
     const { error } = await supabase.from("visits").update(patch).eq("id", id);
     if (error) toast.error(friendlyDbError(error.message)); else { toast.success("Queue updated"); refetch(); }
   }
@@ -99,12 +102,10 @@ function Queue() {
                   <TableCell className="text-lg font-bold text-primary">{v.queue_number}</TableCell>
                   <TableCell>{patientName(v.patients)} <div className="font-mono text-xs text-muted-foreground">{v.patients?.mrn}</div></TableCell>
                   <TableCell className="text-sm">
-                    {v.status === "waiting" ? (
-                      <Select value={v.service_key} onValueChange={(s) => update(v.id, { service_key: s })}>
-                        <SelectTrigger aria-label="Change service" className="h-8 w-52"><SelectValue /></SelectTrigger>
-                        <SelectContent>{services?.map((s) => <SelectItem key={s.key} value={s.key}>{s.name}</SelectItem>)}</SelectContent>
-                      </Select>
-                    ) : svc(v.service_key)}
+                    {serviceLabel(services, v.service_key, v.service_detail)}
+                    {v.status === "waiting" && (
+                      <div><Button size="sm" variant="link" className="h-auto p-0 text-xs" onClick={() => setChanging(v)}>Change service</Button></div>
+                    )}
                   </TableCell>
                   <TableCell className="hidden md:table-cell">{v.visit_type === "walk_in" ? "Walk-in" : "Appointment"}</TableCell>
                   <TableCell className="hidden text-sm md:table-cell">{new Date(v.checked_in_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}<div className="text-xs text-muted-foreground">{names?.[v.checked_in_by ?? ""]}</div></TableCell>
@@ -121,6 +122,30 @@ function Queue() {
           </Table>
         </div>
       </Card>
+      {changing && <ChangeServiceDialog visit={changing} onClose={() => setChanging(null)}
+        onSave={(key, detail) => update(changing.id, { service_key: key, service_detail: serviceDetailFor(key, detail) }).then(() => setChanging(null))} />}
     </div>
+  );
+}
+
+function ChangeServiceDialog({ visit, onClose, onSave }: {
+  visit: { service_key: string; service_detail: string | null }; onClose: () => void; onSave: (key: string, detail: string) => Promise<void>;
+}) {
+  const [key, setKey] = useState(visit.service_key);
+  const [detail, setDetail] = useState(visit.service_detail ?? "");
+  const [busy, setBusy] = useState(false);
+  async function save() {
+    const problem = serviceChoiceProblem(key, detail);
+    if (problem) { toast.error(problem); return; }
+    setBusy(true); await onSave(key, detail); setBusy(false);
+  }
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Change service</DialogTitle><DialogDescription>Only possible while the patient is still waiting.</DialogDescription></DialogHeader>
+        <ServicePicker value={key} detail={detail} onChange={(k, d) => { setKey(k); setDetail(d); }} />
+        <Button className="w-full" onClick={save} disabled={busy}>{busy ? "Saving…" : "Save service"}</Button>
+      </DialogContent>
+    </Dialog>
   );
 }

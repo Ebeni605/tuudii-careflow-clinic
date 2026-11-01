@@ -12,6 +12,7 @@ import { LoadError, PageHeader, PageLoading, RequireArea } from "@/components/Ap
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, today, useLiveTable, useServices, VISIT_STATUS_LABEL } from "@/lib/data";
+import { serviceLabel } from "@/lib/services";
 import { fmtTime } from "@/lib/opd-queries";
 import { useStaff, requireArea } from "@/lib/auth";
 import { ageFromDob } from "@/lib/workflow";
@@ -63,7 +64,6 @@ function OpdDashboard() {
     (service === "all" || v.service_key === service) &&
     (status === "all" || (status === "open" ? !["completed", "cancelled", "no_show"].includes(v.status) : v.status === status)) &&
     (!needle || v.patients?.mrn.toLowerCase().includes(needle) || patientName(v.patients).toLowerCase().includes(needle)));
-  const svc = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
 
   async function call(id: string) {
     const { data, error } = await supabase.from("visits").update({ status: "in_consultation" }).eq("id", id).eq("status", "waiting").select("id");
@@ -148,7 +148,7 @@ function OpdDashboard() {
                       {v.patients?.allergies && <span className="rounded bg-destructive/10 px-1.5 text-xs text-destructive">Allergy</span>}
                     </TableCell>
                     <TableCell className="capitalize">{v.patients?.sex} · {ageFromDob(v.patients?.date_of_birth ?? null, new Date(), v.patients?.dob_estimated ?? false) ?? "—"}</TableCell>
-                    <TableCell className="text-sm">{svc(v.service_key)}</TableCell>
+                    <TableCell className="text-sm">{serviceLabel(services, v.service_key, v.service_detail)}</TableCell>
                     <TableCell className="text-sm">{fmtTime(v.checked_in_at)}</TableCell>
                     <TableCell>
                       <div className="flex flex-col items-start gap-1">

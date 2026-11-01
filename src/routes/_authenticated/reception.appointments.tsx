@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LoadError, PageHeader, RequireArea } from "@/components/AppShell";
 import { CheckInDialog } from "@/components/CheckInDialog";
+import { ServicePicker } from "@/components/ServicePicker";
+import { serviceChoiceProblem, serviceDetailFor, serviceLabel } from "@/lib/services";
 import { StatusBadge } from "@/components/StatusBadge";
 import { PatientPicker, type PickedPatient } from "@/components/PatientPicker";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,13 +35,14 @@ const toLocalInput = (iso: string) => {
 };
 const fromLocal = (date: string, time: string) => new Date(`${date}T${time}:00+03:00`).toISOString();
 
-type Appt = { id: string; patient_id: string; service_key: string; scheduled_at: string; reason: string | null; status: string; cancel_reason: string | null; patients: { id: string; mrn: string; first_name: string; middle_name: string | null; last_name: string } | null };
+type Appt = { id: string; patient_id: string; service_key: string; service_detail: string | null; scheduled_at: string; reason: string | null; status: string; cancel_reason: string | null; patients: { id: string; mrn: string; first_name: string; middle_name: string | null; last_name: string } | null };
 
 function Appointments() {
   const [day, setDay] = useState(today());
   const [status, setStatus] = useState("all");
   const [patient, setPatient] = useState<PickedPatient | null>(null);
   const [service, setService] = useState("");
+  const [detail, setDetail] = useState("");
   const [time, setTime] = useState("09:00");
   const [date, setDate] = useState(today());
   const [reason, setReason] = useState("");
@@ -62,7 +65,7 @@ function Appointments() {
     },
   });
   const rows = (appts ?? []).filter((a) => status === "all" || a.status === status);
-  const svc = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
+  const svc = (k: string) => serviceLabel(services, k);
   const refresh = () => { qc.invalidateQueries({ queryKey: ["appts"] }); qc.invalidateQueries({ queryKey: ["reception_dash"] }); };
 
   async function slotWarning(when: string, svcKey: string, excludeId?: string) {
@@ -73,16 +76,17 @@ function Appointments() {
 
   async function book() {
     if (!patient) { toast.error("Choose a patient"); return; }
-    if (!service) { toast.error("Choose a service"); return; }
+    const problem = serviceChoiceProblem(service, detail);
+    if (problem) { toast.error(problem); return; }
     if (!date || !time) { toast.error("Choose date and time"); return; }
     const when = fromLocal(date, time);
     if (await slotWarning(when, service)) return;
     setBusy(true);
-    const { error } = await supabase.from("appointments").insert({ patient_id: patient.id, service_key: service, reason: reason.trim() || null, scheduled_at: when });
+    const { error } = await supabase.from("appointments").insert({ patient_id: patient.id, service_key: service, service_detail: serviceDetailFor(service, detail), reason: reason.trim() || null, scheduled_at: when });
     setBusy(false);
     if (error) { toast.error(friendlyDbError(error.message)); return; }
     toast.success(`Appointment booked for ${patient.label}`);
-    setPatient(null); setReason(""); setDay(date); refresh();
+    setPatient(null); setReason(""); setDetail(""); setDay(date); refresh();
   }
 
   async function setNoShow(a: Appt) {
@@ -97,13 +101,7 @@ function Appointments() {
         <CardHeader><CardTitle className="text-base">Book appointment</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="space-y-1.5"><Label>Patient *</Label><PatientPicker value={patient} onChange={setPatient} /></div>
-          <div className="space-y-1.5">
-            <Label>Service *</Label>
-            <Select value={service} onValueChange={setService}>
-              <SelectTrigger aria-label="Service"><SelectValue placeholder="Select service" /></SelectTrigger>
-              <SelectContent>{services?.map((s) => <SelectItem key={s.key} value={s.key}>{s.name}</SelectItem>)}</SelectContent>
-            </Select>
-          </div>
+          <ServicePicker label="Service *" value={service} detail={detail} onChange={(k, d) => { setService(k); setDetail(d); }} />
           <div className="grid grid-cols-2 gap-2">
             <div className="space-y-1.5"><Label>Date *</Label><Input type="date" min={today()} value={date} onChange={(e) => setDate(e.target.value)} /></div>
             <div className="space-y-1.5"><Label>Time *</Label><Input type="time" value={time} onChange={(e) => setTime(e.target.value)} /></div>
@@ -138,11 +136,11 @@ function Appointments() {
                   <TableCell className="font-semibold">{toLocalInput(a.scheduled_at).time}</TableCell>
                   <TableCell>{patientName(a.patients)} <span className="font-mono text-xs text-muted-foreground">{a.patients?.mrn}</span>
                     <div className="text-xs text-muted-foreground">{a.reason}{a.cancel_reason && ` · Cancelled: ${a.cancel_reason}`}</div></TableCell>
-                  <TableCell className="text-sm">{svc(a.service_key)}</TableCell>
+                  <TableCell className="text-sm">{serviceLabel(services, a.service_key, a.service_detail)}</TableCell>
                   <TableCell><StatusBadge status={a.status} label={APPT_STATUS_LABEL[a.status]} /></TableCell>
                   <TableCell className="text-right">
                     {a.status === "scheduled" && a.patients && <div className="flex flex-wrap justify-end gap-1">
-                      {day === today() && <CheckInDialog patientId={a.patients.id} patientLabel={patientName(a.patients)} appointmentId={a.id} defaultService={a.service_key} onDone={refresh} />}
+                      {day === today() && <CheckInDialog patientId={a.patients.id} patientLabel={patientName(a.patients)} appointmentId={a.id} defaultService={a.service_key} defaultDetail={a.service_detail} onDone={refresh} />}
                       <Button size="sm" variant="ghost" onClick={() => setEditing(a)}>Edit</Button>
                       {day <= today() && <Button size="sm" variant="ghost" onClick={() => setNoShow(a)}>No show</Button>}
                       <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setCancelling(a)}>Cancel</Button>
@@ -162,18 +160,20 @@ function Appointments() {
 }
 
 function EditDialog({ appt, onClose, onSaved, slotWarning }: { appt: Appt; onClose: () => void; onSaved: () => void; slotWarning: (w: string, s: string, id?: string) => Promise<boolean> }) {
-  const { data: services } = useServices();
   const init = toLocalInput(appt.scheduled_at);
   const [date, setDate] = useState(init.date);
   const [time, setTime] = useState(init.time);
   const [service, setService] = useState(appt.service_key);
+  const [detail, setDetail] = useState(appt.service_detail ?? "");
   const [reason, setReason] = useState(appt.reason ?? "");
   const [busy, setBusy] = useState(false);
   async function save() {
+    const problem = serviceChoiceProblem(service, detail);
+    if (problem) { toast.error(problem); return; }
     const when = fromLocal(date, time);
     if (when !== appt.scheduled_at || service !== appt.service_key) { if (await slotWarning(when, service, appt.id)) return; }
     setBusy(true);
-    const { error } = await supabase.from("appointments").update({ scheduled_at: when, service_key: service, reason: reason.trim() || null }).eq("id", appt.id);
+    const { error } = await supabase.from("appointments").update({ scheduled_at: when, service_key: service, service_detail: serviceDetailFor(service, detail), reason: reason.trim() || null }).eq("id", appt.id);
     setBusy(false);
     if (error) { toast.error(friendlyDbError(error.message)); return; }
     toast.success("Appointment updated"); onSaved(); onClose();
@@ -183,10 +183,7 @@ function EditDialog({ appt, onClose, onSaved, slotWarning }: { appt: Appt; onClo
       <DialogContent>
         <DialogHeader><DialogTitle>Edit appointment</DialogTitle><DialogDescription>{patientName(appt.patients)} · {appt.patients?.mrn}</DialogDescription></DialogHeader>
         <div className="space-y-3">
-          <Select value={service} onValueChange={setService}>
-            <SelectTrigger aria-label="Service"><SelectValue /></SelectTrigger>
-            <SelectContent>{services?.map((s) => <SelectItem key={s.key} value={s.key}>{s.name}</SelectItem>)}</SelectContent>
-          </Select>
+          <ServicePicker label="Service *" value={service} detail={detail} onChange={(k, d) => { setService(k); setDetail(d); }} />
           <div className="grid grid-cols-2 gap-2">
             <Input type="date" aria-label="Date" min={today()} value={date} onChange={(e) => setDate(e.target.value)} />
             <Input type="time" aria-label="Time" value={time} onChange={(e) => setTime(e.target.value)} />
