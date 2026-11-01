@@ -8,6 +8,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { CheckInDialog } from "@/components/CheckInDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { APPT_STATUS_LABEL, clinicDayRange, patientName, today, useLiveTable, useServices } from "@/lib/data";
+import { serviceLabel } from "@/lib/services";
 import { requireArea } from "@/lib/auth";
 
 export const Route = createFileRoute("/_authenticated/reception/")({
@@ -39,7 +40,6 @@ function ReceptionDashboard() {
   });
   const v = data?.visits ?? [];
   const appts = data?.appts ?? [];
-  const svc = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
   const stats = [
     { label: "Registered patients", value: data?.total, icon: Users },
     { label: "Registered today", value: data?.regToday, icon: UserPlus },

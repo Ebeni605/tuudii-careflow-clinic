@@ -12,6 +12,7 @@ import { LoadError, PageHeader, PageLoading, RequireArea } from "@/components/Ap
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { patientName, today, useLiveTable, useServices, VISIT_STATUS_LABEL } from "@/lib/data";
+import { serviceLabel } from "@/lib/services";
 import { fmtTime } from "@/lib/opd-queries";
 import { useStaff, requireArea } from "@/lib/auth";
 import { ageFromDob } from "@/lib/workflow";
@@ -63,7 +64,6 @@ function OpdDashboard() {
     (service === "all" || v.service_key === service) &&
     (status === "all" || (status === "open" ? !["completed", "cancelled", "no_show"].includes(v.status) : v.status === status)) &&
     (!needle || v.patients?.mrn.toLowerCase().includes(needle) || patientName(v.patients).toLowerCase().includes(needle)));
-  const svc = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
 
   async function call(id: string) {
     const { data, error } = await supabase.from("visits").update({ status: "in_consultation" }).eq("id", id).eq("status", "waiting").select("id");
