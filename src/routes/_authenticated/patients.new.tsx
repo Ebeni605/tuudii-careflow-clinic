@@ -5,15 +5,15 @@ import { useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PageHeader, RequireArea } from "@/components/AppShell";
 import { PatientForm } from "@/components/PatientForm";
+import { ServicePicker } from "@/components/ServicePicker";
 import { supabase } from "@/integrations/supabase/client";
 import { requireArea } from "@/lib/auth";
-import { patientName, useServices } from "@/lib/data";
+import { patientName } from "@/lib/data";
+import { serviceChoiceProblem, serviceDetailFor } from "@/lib/services";
 import { friendlyDbError, toPatientRow, type PatientFormValues } from "@/lib/patient-schema";
 import { ageFromDob } from "@/lib/workflow";
 
