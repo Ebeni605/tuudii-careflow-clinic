@@ -24,6 +24,7 @@ export type Database = {
           patient_id: string
           reason: string | null
           scheduled_at: string
+          service_detail: string | null
           service_key: string
           status: string
           updated_at: string
@@ -38,6 +39,7 @@ export type Database = {
           patient_id: string
           reason?: string | null
           scheduled_at: string
+          service_detail?: string | null
           service_key: string
           status?: string
           updated_at?: string
@@ -52,6 +54,7 @@ export type Database = {
           patient_id?: string
           reason?: string | null
           scheduled_at?: string
+          service_detail?: string | null
           service_key?: string
           status?: string
           updated_at?: string
@@ -1439,6 +1442,7 @@ export type Database = {
           queue_date: string
           queue_number: number | null
           reception_notes: string | null
+          service_detail: string | null
           service_key: string
           started_at: string | null
           status: string
@@ -1455,6 +1459,7 @@ export type Database = {
           queue_date?: string
           queue_number?: number | null
           reception_notes?: string | null
+          service_detail?: string | null
           service_key: string
           started_at?: string | null
           status?: string
@@ -1471,6 +1476,7 @@ export type Database = {
           queue_date?: string
           queue_number?: number | null
           reception_notes?: string | null
+          service_detail?: string | null
           service_key?: string
           started_at?: string | null
           status?: string
