@@ -84,12 +84,9 @@ function ReceptionDashboard() {
                   <span className="w-14 font-semibold text-primary">{new Date(a.scheduled_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                   <div>
                     <div className="font-medium">{patientName(a.patients)} <span className="font-mono text-xs text-muted-foreground">{a.patients?.mrn}</span></div>
-                    <div className="text-xs text-muted-foreground">{svc(a.service_key)}{a.reason && ` · ${a.reason}`}</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <StatusBadge status={a.status} label={APPT_STATUS_LABEL[a.status]} />
-                  {a.status === "scheduled" && a.patients && <CheckInDialog patientId={a.patients.id} patientLabel={patientName(a.patients)} appointmentId={a.id} defaultService={a.service_key} />}
+                    <div className="text-xs text-muted-foreground">{serviceLabel(services, a.service_key, a.service_detail)}{a.reason && ` · ${a.reason}`}</div>
+...
+                  {a.status === "scheduled" && a.patients && <CheckInDialog patientId={a.patients.id} patientLabel={patientName(a.patients)} appointmentId={a.id} defaultService={a.service_key} defaultDetail={a.service_detail} />}
                 </div>
               </div>
             ))}

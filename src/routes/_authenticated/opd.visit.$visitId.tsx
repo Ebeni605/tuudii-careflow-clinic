@@ -74,7 +74,7 @@ function Encounter() {
   const p = visit.patients!;
   const status = visit.status as VisitStatus;
   const template = templateFor(visit.service_key);
-  const svcName = services?.find((s) => s.key === visit.service_key)?.name ?? visit.service_key;
+  const svcName = serviceLabel(services, visit.service_key, visit.service_detail);
   const isOpen = OPEN_ENCOUNTER_STATUSES.includes(status);
   const signed = consult?.status === "signed";
   const editable = isClinician && isOpen && !!consult && !signed;

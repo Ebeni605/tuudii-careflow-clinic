@@ -148,7 +148,7 @@ function OpdDashboard() {
                       {v.patients?.allergies && <span className="rounded bg-destructive/10 px-1.5 text-xs text-destructive">Allergy</span>}
                     </TableCell>
                     <TableCell className="capitalize">{v.patients?.sex} · {ageFromDob(v.patients?.date_of_birth ?? null, new Date(), v.patients?.dob_estimated ?? false) ?? "—"}</TableCell>
-                    <TableCell className="text-sm">{svc(v.service_key)}</TableCell>
+                    <TableCell className="text-sm">{serviceLabel(services, v.service_key, v.service_detail)}</TableCell>
                     <TableCell className="text-sm">{fmtTime(v.checked_in_at)}</TableCell>
                     <TableCell>
                       <div className="flex flex-col items-start gap-1">
