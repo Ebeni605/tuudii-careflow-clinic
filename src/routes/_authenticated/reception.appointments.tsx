@@ -65,7 +65,7 @@ function Appointments() {
     },
   });
   const rows = (appts ?? []).filter((a) => status === "all" || a.status === status);
-  const svc = (k: string) => services?.find((s) => s.key === k)?.name ?? k;
+  const svc = (k: string) => serviceLabel(services, k);
   const refresh = () => { qc.invalidateQueries({ queryKey: ["appts"] }); qc.invalidateQueries({ queryKey: ["reception_dash"] }); };
 
   async function slotWarning(when: string, svcKey: string, excludeId?: string) {
