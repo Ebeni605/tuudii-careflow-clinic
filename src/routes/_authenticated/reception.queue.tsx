@@ -6,7 +6,6 @@ import { Search, UserPlus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { LoadError, PageHeader, RequireArea } from "@/components/AppShell";
 import { CheckInDialog } from "@/components/CheckInDialog";
@@ -122,6 +121,30 @@ function Queue() {
           </Table>
         </div>
       </Card>
+      {changing && <ChangeServiceDialog visit={changing} onClose={() => setChanging(null)}
+        onSave={(key, detail) => update(changing.id, { service_key: key, service_detail: serviceDetailFor(key, detail) }).then(() => setChanging(null))} />}
     </div>
+  );
+}
+
+function ChangeServiceDialog({ visit, onClose, onSave }: {
+  visit: { service_key: string; service_detail: string | null }; onClose: () => void; onSave: (key: string, detail: string) => Promise<void>;
+}) {
+  const [key, setKey] = useState(visit.service_key);
+  const [detail, setDetail] = useState(visit.service_detail ?? "");
+  const [busy, setBusy] = useState(false);
+  async function save() {
+    const problem = serviceChoiceProblem(key, detail);
+    if (problem) { toast.error(problem); return; }
+    setBusy(true); await onSave(key, detail); setBusy(false);
+  }
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>
+        <DialogHeader><DialogTitle>Change service</DialogTitle><DialogDescription>Only possible while the patient is still waiting.</DialogDescription></DialogHeader>
+        <ServicePicker value={key} detail={detail} onChange={(k, d) => { setKey(k); setDetail(d); }} />
+        <Button className="w-full" onClick={save} disabled={busy}>{busy ? "Saving…" : "Save service"}</Button>
+      </DialogContent>
+    </Dialog>
   );
 }
