@@ -15,6 +15,13 @@
       "when": 1793508009243,
       "tag": "0001_service_detail_on_visits_and_appointments",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793606293066,
+      "tag": "0002_patient_journey_handovers",
+      "breakpoints": true
     }
   ]
 }

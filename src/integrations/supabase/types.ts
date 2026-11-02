@@ -171,26 +171,32 @@ export type Database = {
       }
       billing_settings: {
         Row: {
+          allow_partial_payments: boolean
           approval_note: string | null
           currency: string
           enabled: boolean
           id: number
+          payment_methods: string[]
           updated_at: string
           updated_by: string | null
         }
         Insert: {
+          allow_partial_payments?: boolean
           approval_note?: string | null
           currency?: string
           enabled?: boolean
           id?: number
+          payment_methods?: string[]
           updated_at?: string
           updated_by?: string | null
         }
         Update: {
+          allow_partial_payments?: boolean
           approval_note?: string | null
           currency?: string
           enabled?: boolean
           id?: number
+          payment_methods?: string[]
           updated_at?: string
           updated_by?: string | null
         }
@@ -458,6 +464,100 @@ export type Database = {
         }
         Relationships: []
       }
+      handover_notifications: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          created_by: string | null
+          detail: string | null
+          id: string
+          kind: string
+          lab_request_id: string | null
+          patient_id: string
+          payment_request_id: string | null
+          ref_id: string | null
+          target_department: string
+          title: string
+          visit_id: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          detail?: string | null
+          id?: string
+          kind: string
+          lab_request_id?: string | null
+          patient_id: string
+          payment_request_id?: string | null
+          ref_id?: string | null
+          target_department: string
+          title: string
+          visit_id: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          detail?: string | null
+          id?: string
+          kind?: string
+          lab_request_id?: string | null
+          patient_id?: string
+          payment_request_id?: string | null
+          ref_id?: string | null
+          target_department?: string
+          title?: string
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "handover_notifications_acknowledged_by_fkey"
+            columns: ["acknowledged_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handover_notifications_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handover_notifications_lab_request_id_fkey"
+            columns: ["lab_request_id"]
+            isOneToOne: false
+            referencedRelation: "lab_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handover_notifications_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handover_notifications_payment_request_id_fkey"
+            columns: ["payment_request_id"]
+            isOneToOne: false
+            referencedRelation: "payment_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "handover_notifications_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_items: {
         Row: {
           charge_id: string | null
@@ -527,6 +627,7 @@ export type Database = {
           issued_by: string | null
           notes: string | null
           patient_id: string
+          payment_request_id: string | null
           status: string
           updated_at: string
           visit_id: string | null
@@ -544,6 +645,7 @@ export type Database = {
           issued_by?: string | null
           notes?: string | null
           patient_id: string
+          payment_request_id?: string | null
           status?: string
           updated_at?: string
           visit_id?: string | null
@@ -561,6 +663,7 @@ export type Database = {
           issued_by?: string | null
           notes?: string | null
           patient_id?: string
+          payment_request_id?: string | null
           status?: string
           updated_at?: string
           visit_id?: string | null
@@ -574,6 +677,13 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_payment_request_id_fkey"
+            columns: ["payment_request_id"]
+            isOneToOne: false
+            referencedRelation: "payment_requests"
             referencedColumns: ["id"]
           },
           {
@@ -699,6 +809,8 @@ export type Database = {
       }
       lab_requests: {
         Row: {
+          accepted_at: string | null
+          accepted_by: string | null
           clinical_notes: string | null
           consultation_id: string | null
           created_at: string
@@ -711,6 +823,8 @@ export type Database = {
           visit_id: string
         }
         Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
           clinical_notes?: string | null
           consultation_id?: string | null
           created_at?: string
@@ -723,6 +837,8 @@ export type Database = {
           visit_id: string
         }
         Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
           clinical_notes?: string | null
           consultation_id?: string | null
           created_at?: string
@@ -735,6 +851,13 @@ export type Database = {
           visit_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lab_requests_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lab_requests_consultation_id_fkey"
             columns: ["consultation_id"]
@@ -1256,6 +1379,164 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_request_items: {
+        Row: {
+          category: string
+          charge_id: string
+          created_at: string
+          description: string
+          id: string
+          lab_request_item_id: string | null
+          line_total: number | null
+          payment_request_id: string
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          category: string
+          charge_id: string
+          created_at?: string
+          description: string
+          id?: string
+          lab_request_item_id?: string | null
+          line_total?: number | null
+          payment_request_id: string
+          quantity: number
+          unit_price: number
+        }
+        Update: {
+          category?: string
+          charge_id?: string
+          created_at?: string
+          description?: string
+          id?: string
+          lab_request_item_id?: string | null
+          line_total?: number | null
+          payment_request_id?: string
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_request_items_charge_id_fkey"
+            columns: ["charge_id"]
+            isOneToOne: false
+            referencedRelation: "service_charges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_request_items_lab_request_item_id_fkey"
+            columns: ["lab_request_item_id"]
+            isOneToOne: false
+            referencedRelation: "lab_request_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_request_items_payment_request_id_fkey"
+            columns: ["payment_request_id"]
+            isOneToOne: false
+            referencedRelation: "payment_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_requests: {
+        Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          consultation_id: string | null
+          id: string
+          invoiced_at: string | null
+          invoiced_by: string | null
+          notes: string | null
+          patient_id: string
+          request_number: string
+          requested_at: string
+          requested_by: string | null
+          status: string
+          updated_at: string
+          visit_id: string
+        }
+        Insert: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          consultation_id?: string | null
+          id?: string
+          invoiced_at?: string | null
+          invoiced_by?: string | null
+          notes?: string | null
+          patient_id: string
+          request_number: string
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+          visit_id: string
+        }
+        Update: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          consultation_id?: string | null
+          id?: string
+          invoiced_at?: string | null
+          invoiced_by?: string | null
+          notes?: string | null
+          patient_id?: string
+          request_number?: string
+          requested_at?: string
+          requested_by?: string | null
+          status?: string
+          updated_at?: string
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_requests_cancelled_by_fkey"
+            columns: ["cancelled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_requests_consultation_id_fkey"
+            columns: ["consultation_id"]
+            isOneToOne: false
+            referencedRelation: "consultations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_requests_invoiced_by_fkey"
+            columns: ["invoiced_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_requests_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_requests_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_requests_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -1430,6 +1711,64 @@ export type Database = {
         }
         Relationships: []
       }
+      visit_handovers: {
+        Row: {
+          from_department: string | null
+          from_status: string | null
+          handed_at: string
+          handed_by: string | null
+          id: string
+          patient_id: string
+          to_department: string
+          to_status: string
+          visit_id: string
+        }
+        Insert: {
+          from_department?: string | null
+          from_status?: string | null
+          handed_at?: string
+          handed_by?: string | null
+          id?: string
+          patient_id: string
+          to_department: string
+          to_status: string
+          visit_id: string
+        }
+        Update: {
+          from_department?: string | null
+          from_status?: string | null
+          handed_at?: string
+          handed_by?: string | null
+          id?: string
+          patient_id?: string
+          to_department?: string
+          to_status?: string
+          visit_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visit_handovers_handed_by_fkey"
+            columns: ["handed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_handovers_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "visit_handovers_visit_id_fkey"
+            columns: ["visit_id"]
+            isOneToOne: false
+            referencedRelation: "visits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       visits: {
         Row: {
           appointment_id: string | null
@@ -1446,6 +1785,7 @@ export type Database = {
           service_key: string
           started_at: string | null
           status: string
+          visit_number: string | null
           visit_type: string
         }
         Insert: {
@@ -1463,6 +1803,7 @@ export type Database = {
           service_key: string
           started_at?: string | null
           status?: string
+          visit_number?: string | null
           visit_type?: string
         }
         Update: {
@@ -1480,6 +1821,7 @@ export type Database = {
           service_key?: string
           started_at?: string | null
           status?: string
+          visit_number?: string | null
           visit_type?: string
         }
         Relationships: [
@@ -1596,6 +1938,8 @@ export type Database = {
       }
     }
     Functions: {
+      accept_lab_request: { Args: { _request_id: string }; Returns: undefined }
+      acknowledge_notification: { Args: { _id: string }; Returns: undefined }
       admin_exists: { Args: never; Returns: boolean }
       age_band: { Args: { _dob: string; _on: string }; Returns: string }
       amend_lab_result: {
@@ -1604,6 +1948,10 @@ export type Database = {
       }
       billing_enabled: { Args: never; Returns: boolean }
       can_verify_lab: { Args: { _user_id: string }; Returns: boolean }
+      cancel_payment_request: {
+        Args: { _reason: string; _request_id: string }
+        Returns: undefined
+      }
       clinic_date: { Args: { _ts: string }; Returns: string }
       clinic_today: { Args: never; Returns: string }
       collect_specimen: {
@@ -1618,6 +1966,10 @@ export type Database = {
           _specimen_type: string
         }
         Returns: Json
+      }
+      create_invoice_from_request: {
+        Args: { _request_id: string }
+        Returns: string
       }
       create_lab_order: {
         Args: {
@@ -1657,6 +2009,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      in_department: { Args: { _dept: string }; Returns: boolean }
       invoice_balance: { Args: { _invoice: string }; Returns: number }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       receive_specimen: {
@@ -1716,12 +2069,33 @@ export type Database = {
         }
         Returns: Json
       }
+      submit_payment_request: {
+        Args: { _items: Json; _notes?: string; _visit_id: string }
+        Returns: Json
+      }
+      sync_visit_payment: { Args: { _invoice: string }; Returns: undefined }
       update_my_profile: {
         Args: { _full_name: string; _phone: string }
         Returns: undefined
       }
+      visit_department: { Args: { _status: string }; Returns: string }
       void_invoice: {
         Args: { _invoice_id: string; _reason: string }
+        Returns: undefined
+      }
+      wf_ack: {
+        Args: { _kinds: string[]; _ref?: string; _visit: string }
+        Returns: undefined
+      }
+      wf_notify: {
+        Args: {
+          _kind: string
+          _lab_request?: string
+          _payment_request?: string
+          _ref?: string
+          _target: string
+          _visit: string
+        }
         Returns: undefined
       }
     }
