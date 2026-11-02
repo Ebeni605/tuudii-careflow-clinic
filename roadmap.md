@@ -18,3 +18,9 @@
 - Clinic to enter validated units/reference intervals; confirm meaning of B/F and BF
 - Clinic to approve prices + payment workflow before billing is switched on
 - Remove test accounts and fictional records before real use
+
+## Patient journey & handovers (Reception → OPD → Lab → OPD → Reception payment → Completed)
+- [ ] DB: new visit steps (lab processing, awaiting payment, partly paid, ready to close), visit numbers, handover history, persistent notifications, payment requests, invoice-from-request, payment settings (methods, partial), backend-only transitions
+- [ ] UI: visit slip with QR, notification bell + department inboxes, OPD lists (returned from lab, payment, ready to close), payment request panel, Reception "Received from OPD", lab accept + visit/encounter IDs, billing setup methods/partial
+- [ ] Restore lab test catalogue names (no units/ranges) and billing settings row lost in remix
+- [ ] Tests: workflow rules unit tests; DB scenarios A/B + rejected/partial/duplicate/permissions; browser check
